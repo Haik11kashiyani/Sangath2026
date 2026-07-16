@@ -1,0 +1,262 @@
+.careers-page {
+  min-height: 100vh;
+  background: var(--cream);
+}
+
+/* Intro Section */
+.careers-intro-section {
+  padding: 5rem 0 3rem;
+}
+
+.careers-intro-content {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.careers-intro-content h2 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+}
+
+.careers-intro-content > p {
+  font-size: 1.06rem;
+  line-height: 1.9;
+  color: var(--text-body);
+  margin: 0 auto 2.5rem;
+  max-width: 760px;
+}
+
+.perks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.4rem;
+  margin-top: 2rem;
+}
+
+.perk-card {
+  background: #ffffff;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 1.8rem 1.4rem;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.perk-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-soft);
+}
+
+.perk-icon {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 0.85rem;
+}
+
+.perk-card h4 {
+  font-size: 1.05rem;
+  color: var(--text-dark);
+  margin-bottom: 0.55rem;
+}
+
+.perk-card p {
+  font-size: 0.93rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Openings */
+.openings-section {
+  padding: 3rem 0;
+}
+
+.openings-section h2 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.openings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 2rem;
+}
+
+.job-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  background: #ffffff;
+  border: 1px solid var(--border-soft);
+  border-left: 5px solid var(--primary-navy);
+  border-radius: var(--radius);
+  padding: 1.8rem 2rem;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft);
+}
+
+.job-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.job-title {
+  font-size: 1.25rem;
+  color: var(--text-dark);
+  margin-bottom: 0.55rem;
+}
+
+.job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.job-dept {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--primary-navy);
+  background: rgba(11, 19, 32, 0.07);
+  padding: 0.22rem 0.7rem;
+  border-radius: 999px;
+}
+
+.job-sep {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.job-location,
+.job-type {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.job-description {
+  font-size: 0.97rem;
+  color: var(--text-body);
+  line-height: 1.75;
+  margin: 0;
+}
+
+.job-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.btn-apply {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--primary-navy), #28384c);
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0.82rem 1.6rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  border-radius: 999px;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  white-space: nowrap;
+}
+
+.btn-apply:hover {
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px rgba(8, 13, 23, 0.22);
+}
+
+/* CTA */
+.careers-cta {
+  padding: 3rem 0 5rem;
+}
+
+.careers-cta-box {
+  background: linear-gradient(135deg, rgba(5, 9, 17, 0.94), rgba(38, 50, 65, 0.88)),
+    url('/images/Cumin_Seeds.jpg') center/cover;
+  color: #ffffff;
+  padding: 3.5rem 2.5rem;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.careers-cta-box h2 {
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.careers-cta-box p {
+  font-size: 1.06rem;
+  color: rgba(255, 255, 255, 0.84);
+  max-width: 640px;
+  margin: 0 auto 1.8rem;
+  line-height: 1.8;
+}
+
+.btn-send-cv {
+  display: inline-block;
+  background: #ffffff;
+  color: var(--primary-navy);
+  text-decoration: none;
+  padding: 1rem 2.2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: 999px;
+  transition: background 0.22s ease, transform 0.22s ease;
+}
+
+.btn-send-cv:hover {
+  background: #fff8e7;
+  color: var(--primary-navy);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .job-card {
+    flex-direction: column;
+  }
+
+  .job-action {
+    width: 100%;
+  }
+
+  .btn-apply {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .careers-intro-section,
+  .openings-section {
+    padding: 3.5rem 0 2rem;
+  }
+
+  .perks-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .careers-cta-box {
+    padding: 2.5rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .perks-grid {
+    grid-template-columns: 1fr;
+  }
+}

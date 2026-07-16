@@ -1,0 +1,230 @@
+{
+  "categories": [
+    {
+      "id": "spices",
+      "name": "Spices",
+      "products": [
+        {
+          "id": "cumin-powder",
+          "name": "Cumin Powder",
+          "description": "Sangath Global Exim manufactures and exports high-quality Cumin Powder (Jeera Powder) made from premium cumin seeds. Processed as per US FDA and ASTA quality standards, including Roasted Cumin Powder and ETO treated variants. Widely used to enhance the flavour of rice, stuffed vegetables, and a variety of dishes.",
+          "image": "/images/Cumin_Powder.webp",
+          "featured": true
+        },
+        {
+          "id": "turmeric-powder",
+          "name": "Turmeric Powder",
+          "description": "A bright yellow spice made from dried turmeric rhizomes with a warm, slightly peppery flavour. Widely used in cooking for its colour, taste, and health benefits. Rich in curcumin, it is also valued in cosmetic and medicinal applications.",
+          "image": "/images/turmeric_powder.jpg",
+          "featured": true
+        },
+        {
+          "id": "red-chilli",
+          "name": "Red Chilli",
+          "description": "Originating from South America, Sangath Global Exim offers the best quality red chilli powder, ideal for preparing a wide variety of cuisines such as curry, sausages, and more. Processed and packed under strict quality norms.",
+          "image": "/images/red_chilli.jpeg",
+          "featured": false
+        },
+        {
+          "id": "coriander-powder",
+          "name": "Coriander Powder",
+          "description": "Sangath Global Exim manufactures and exports high-quality Coriander Powder (Dhaniya Powder), produced by grinding premium coriander seeds and processed per US FDA and ASTA quality standards including ETO treatment. It has a warm, slightly citrusy flavour.",
+          "image": "/images/Coriander_powder.webp",
+          "featured": false
+        },
+        {
+          "id": "fenugreek-powder",
+          "name": "Fenugreek Powder",
+          "description": "Fenugreek (Methi) is native to South Eastern Europe and West Asia. Known for its medicinal properties, the seeds are 6–8 mm long, oblong or square, with a strong aroma and slight bitterness. Used extensively as a spice and condiment.",
+          "image": "/images/Fenugreek_Powder.webp",
+          "featured": false,
+          "details": [
+            {
+              "type": "text",
+              "content": "Fenugreek (Trigonella foenum-graecum) is a clover-like herb native to the Mediterranean region, southern Europe, and western Asia. The seeds are used in cooking and as medicine. They smell and taste like maple syrup."
+            },
+            {
+              "type": "list",
+              "title": "Fenugreek seeds contain:",
+              "items": [
+                "45-60% carbohydrates",
+                "20-30% proteins high in tryptophan and lysine",
+                "5-10% fixed oils (lipids)",
+                "Pyridine alkaloids: choline (0.5%), trigonelline (0.2-0.38%), gentianine, and carpaine",
+                "Flavonoids: apigenin, orientin, and luteolin"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Fenugreek seeds are used as a spice and condiment to improve the flavour and nutritive value of foods. They are also used in spice blends and as a flavouring agent in beverages."
+            }
+          ],
+          "specifications": [
+            {
+              "variety": "Whole Fenugreek Seeds",
+              "origin": "India",
+              "specification": "Moisture: 6-7%, Admixture: <1%, Purity: 97% / 98% / 99%",
+              "packaging": "20, 50 Kg Gunny Bags or PP Bags",
+              "fcl": "24 MT"
+            }
+          ]
+        },
+        {
+          "id": "cumin-seeds",
+          "name": "Cumin Seeds",
+          "description": "Premium quality whole cumin seeds sourced from the best growing regions of Gujarat and Rajasthan. Our cumin seeds are cleaned, graded, and processed under strict hygienic conditions to meet international food safety standards.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": true
+        }
+      ]
+    },
+    {
+      "id": "sugar",
+      "name": "Sugar",
+      "products": [
+        {
+          "id": "refined-sugar",
+          "name": "Refined Sugar (S-30 / M-30)",
+          "description": "High-quality refined white sugar conforming to IS-1443 standards. Available in S-30 and M-30 grades, suitable for direct consumption, food processing, and industrial use. Exported in 50 kg HDPE bags or as per buyer specifications.",
+          "image": "/images/turmeric_powder.jpg",
+          "featured": true
+        },
+        {
+          "id": "raw-sugar",
+          "name": "Raw Sugar (ICUMSA 600-1200)",
+          "description": "Raw cane sugar with ICUMSA values between 600 and 1200, sourced from leading Indian sugar mills. Suitable for refining into white sugar. Available in bulk or bagged form as per importer requirements.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "food-grains",
+      "name": "Food Grains",
+      "products": [
+        {
+          "id": "basmati-rice",
+          "name": "Basmati Rice",
+          "description": "Long-grain, aromatic Basmati rice sourced from the foothills of the Himalayas. Known for its distinctive fragrance, fluffy texture, and elongated grains upon cooking. Available in aged and non-aged varieties.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": true
+        },
+        {
+          "id": "non-basmati-rice",
+          "name": "Non-Basmati Rice (IR-64 / Parboiled)",
+          "description": "Premium IR-64, Swarna, and Parboiled rice for bulk export. Suitable for markets in Africa, the Middle East, and Southeast Asia. Exported in 25 kg, 50 kg, and 1 MT big bags.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        },
+        {
+          "id": "wheat",
+          "name": "Wheat",
+          "description": "High-protein Indian wheat with excellent milling quality. Suitable for flour mills, bread production, and food manufacturing. Exported in bulk vessels or 50 kg jute/PP bags.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        },
+        {
+          "id": "maize",
+          "name": "Maize (Corn)",
+          "description": "Yellow and white maize suitable for human consumption, animal feed, and starch production. Sourced from major growing regions in India, meeting international quality and moisture standards.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "pulses",
+      "name": "Pulses",
+      "products": [
+        {
+          "id": "chickpeas",
+          "name": "Chickpeas (Kabuli & Desi)",
+          "description": "Both Kabuli (white) and Desi (brown) chickpeas, cleaned and sorted for export. High in protein and widely used in Middle Eastern, Mediterranean, and South Asian cuisines. Available in various sizes.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": true
+        },
+        {
+          "id": "red-lentils",
+          "name": "Red Lentils (Masoor Dal)",
+          "description": "Split red lentils with high protein content, uniform colour, and low impurity. A staple in many diets worldwide. Available in 25 kg PP bags or as bulk.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        },
+        {
+          "id": "green-moong",
+          "name": "Green Moong Dal",
+          "description": "Whole and split green moong bean of superior quality. Rich in protein and fibre, widely consumed in Indian, Southeast Asian, and African markets.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        },
+        {
+          "id": "kidney-beans",
+          "name": "Kidney Beans (Rajma)",
+          "description": "Dark red kidney beans of premium quality, rich in protein and minerals. Exported in 25–50 kg bags and widely demanded in North America, Europe, and the Middle East.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "ghee",
+      "name": "Ghee",
+      "products": [
+        {
+          "id": "pure-cow-ghee",
+          "name": "Pure Cow Ghee",
+          "description": "Traditionally prepared pure cow ghee with a rich aroma, golden colour, and authentic taste. Made from fresh cow milk and processed under hygienic conditions. Available in 500 ml, 1 L, and bulk (tin) packaging.",
+          "image": "/images/turmeric_powder.jpg",
+          "featured": true
+        }
+      ]
+    },
+    {
+      "id": "tea",
+      "name": "Tea",
+      "products": [
+        {
+          "id": "ctc-tea",
+          "name": "CTC Tea",
+          "description": "Crush, Tear, Curl (CTC) tea from the premier tea gardens of Assam and West Bengal. Known for its strong brew, bright liquor, and bold flavour. Suitable for direct consumption and tea bag production.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": true
+        },
+        {
+          "id": "orthodox-tea",
+          "name": "Orthodox Tea",
+          "description": "Whole-leaf orthodox tea from Darjeeling and Nilgiri regions. Prized for its muscatel aroma, delicate flavour, and golden-tipped appearance. Available in various grades.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        }
+      ]
+    },
+    {
+      "id": "agro-feed",
+      "name": "Agro Feed",
+      "products": [
+        {
+          "id": "de-oiled-rice-bran",
+          "name": "De-Oiled Rice Bran (DORB)",
+          "description": "High-quality de-oiled rice bran used as a nutrient-rich ingredient in animal and poultry feed. Rich in protein, fibre, and micronutrients. Exported in 50 kg bags or bulk containers.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        },
+        {
+          "id": "soybean-meal",
+          "name": "Soybean Meal",
+          "description": "High-protein soybean meal, a by-product of soybean oil extraction. Used widely in poultry, aquaculture, and livestock feed. Available in both 46% and 48% protein variants.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        },
+        {
+          "id": "groundnut-extraction",
+          "name": "Groundnut Extraction",
+          "description": "Protein-rich groundnut extraction suitable as a high-energy supplement in animal and poultry feed. Sourced from expeller-pressed groundnuts with low aflatoxin levels.",
+          "image": "/images/Cumin_Seeds.jpg",
+          "featured": false
+        }
+      ]
+    }
+  ]
+}

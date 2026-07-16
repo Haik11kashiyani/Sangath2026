@@ -1,0 +1,196 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light;
+  color: #20252c;
+  background-color: #f7f6f2;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --primary-navy: #0b1320;
+  --primary-navy-dark: #050911;
+  --primary-navy-hover: #1d2d44;
+  --trade-green: #263241;
+  --spice-gold: #c7a45b;
+  --spice-red: #8f6d4d;
+  --cream: #f7f6f2;
+  --cream-deep: #ebe8df;
+  --surface: #ffffff;
+  --surface-warm: #f9f7f0;
+  --text-dark: #111722;
+  --text-body: #414954;
+  --text-muted: #6d737c;
+  --border-soft: #dfdbcf;
+  --shadow-soft: 0 22px 55px rgba(8, 13, 23, 0.13);
+  --shadow-card: 0 14px 36px rgba(8, 13, 23, 0.08);
+  --radius: 8px;
+  scroll-behavior: smooth;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  font-weight: 500;
+  color: var(--primary-navy);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--primary-navy-hover);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--text-body);
+  background:
+    radial-gradient(circle at top left, rgba(199, 164, 91, 0.12), transparent 34rem),
+    linear-gradient(180deg, #ffffff 0%, var(--cream) 100%);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--primary-navy);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease,
+    box-shadow 0.25s ease, transform 0.25s ease;
+}
+button:hover {
+  background-color: var(--primary-navy-hover);
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Utility Classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+::selection {
+  background: rgba(199, 164, 91, 0.34);
+}
+
+.page-header {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(5, 9, 17, 0.92), rgba(38, 50, 65, 0.84)),
+    url('/images/Cumin_Seeds.jpg') center/cover;
+  color: #ffffff;
+  padding: 5.25rem 0 4.75rem;
+  text-align: center;
+  animation: pageHeaderReveal 0.8s ease both;
+}
+
+.page-header::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 6px;
+  background: linear-gradient(90deg, transparent, var(--spice-gold), transparent);
+}
+
+.page-header .container {
+  position: relative;
+  z-index: 1;
+  animation: contentRise 0.72s ease 0.08s both;
+}
+
+.page-header h1 {
+  color: #ffffff;
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.page-subtitle {
+  color: #f5ead4;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  margin: 0 auto;
+  max-width: 760px;
+}
+
+.section-divider {
+  width: 84px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--spice-gold), #efe3c3);
+  margin: 0 auto 1rem;
+  border-radius: 999px;
+}
+
+input,
+textarea,
+select {
+  color: var(--text-dark);
+}
+
+@keyframes contentRise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageHeaderReveal {
+  from {
+    background-position: center 42%;
+  }
+  to {
+    background-position: center center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
