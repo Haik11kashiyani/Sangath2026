@@ -45,7 +45,9 @@ const handleSubmit = async (e) => {
   setLoading(true)
 
   try {
-    const response = await fetch("https://formspree.io/f/mkoqzlje", {
+    const API_URL = 'http://localhost:5000/api'
+    
+    const response = await fetch(`${API_URL}/contact`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,14 +57,12 @@ const handleSubmit = async (e) => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        message: formData.message,
-        subject: formData.subject,
-        _subject: formData.subject
+        message: formData.message
       })
     })
 
     if (response.ok) {
-      alert("Thank you! Your message has been sent.")
+      alert("Thank you! Your message has been sent successfully.")
       setFormData({
         name: '',
         email: '',
@@ -70,10 +70,14 @@ const handleSubmit = async (e) => {
         subject: '',
         message: ''
       })
+    } else {
+      const error = await response.json()
+      alert(error.error || "Error sending message. Please try again.")
     }
 
-  } catch {
-    alert("Error sending message.")
+  } catch (error) {
+    console.error('Error:', error)
+    alert("Error sending message. Please check your connection and try again.")
   }
 
   setLoading(false)

@@ -15,11 +15,26 @@ function App() {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [categories, setCategories] = useState([])
 
-  // Load products to have them available for detail navigation
+  // Load products from API
   useEffect(() => {
-    fetch('/products.json')
+    const API_URL = 'http://localhost:5000/api';
+    
+    fetch(`${API_URL}/products`)
       .then(res => res.json())
-      .then(data => setCategories(data.categories || []))
+      .then(data => {
+        // Group products by category for compatibility
+        const grouped = {};
+        if (Array.isArray(data)) {
+          data.forEach(product => {
+            const catId = product.category_id || 'general';
+            if (!grouped[catId]) {
+              grouped[catId] = [];
+            }
+            grouped[catId].push(product);
+          });
+        }
+        setCategories(grouped);
+      })
       .catch(err => console.error('App products load error', err))
   }, [])
 
