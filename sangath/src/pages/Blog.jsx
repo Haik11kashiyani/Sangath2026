@@ -12,7 +12,7 @@ function Blog() {
       category: 'Industry Insights',
       title: 'Global Demand for Indian Spices: Trends & Opportunities',
       excerpt:
-        'India remains the world's largest producer and exporter of spices. Discover how global demand is shaping new trade opportunities for exporters.',
+        "India remains the world's largest producer and exporter of spices. Discover how global demand is shaping new trade opportunities for exporters.",
       date: 'June 10, 2026',
       readTime: '4 min read'
     },

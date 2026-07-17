@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:admin": "vite --config src/admin/vite.config.js",
+    "dev:api": "cd server && npm run dev",
     "build": "vite build",
+    "build:admin": "vite build --config src/admin/vite.config.js",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:admin": "vite preview --config src/admin/vite.config.js"
   },
   "dependencies": {
     "autoprefixer": "^10.5.0",

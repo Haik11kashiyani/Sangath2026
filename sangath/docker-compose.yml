@@ -49,7 +49,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
-      target: development
     container_name: sangath-frontend
     ports:
       - "3000:5173"
@@ -65,7 +64,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.admin
-      target: development
     container_name: sangath-admin
     ports:
       - "3001:5173"

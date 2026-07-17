@@ -10,15 +10,32 @@ function Products({ setCurrentPage, onViewDetails }) {
     document.title = 'Products - Sangath Global Exim | Agricultural Commodities'
   }, [])
 
-  // Load products from JSON
+  // Load products from API
   useEffect(() => {
-    fetch('/products.json')
+    const API_URL = 'http://localhost:5000/api'
+
+    fetch(`${API_URL}/products`)
       .then(res => res.json())
       .then(data => {
-        setCategories(data.categories || [])
+        const groups = {}
+        if (Array.isArray(data)) {
+          data.forEach(product => {
+            const categoryId = product.category_id || 'uncategorized'
+            if (!groups[categoryId]) {
+              groups[categoryId] = {
+                id: categoryId,
+                name: categoryId === 'uncategorized' ? 'General' : `Category ${categoryId.substring(0, 8)}`,
+                products: []
+              }
+            }
+            groups[categoryId].products.push(product)
+          })
+        }
+
+        setCategories(Object.values(groups))
       })
       .catch(err => {
-        console.error('Failed to load products.json', err)
+        console.error('Failed to load products from API', err)
       })
   }, [])
 

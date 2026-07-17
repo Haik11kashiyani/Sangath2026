@@ -71,15 +71,15 @@ router.get('/settings', async (req, res) => {
 
 router.post('/contact', async (req, res) => {
   try {
-    const { name, email, phone, message } = req.body;
+    const { name, email, phone, subject, message } = req.body;
     
     if (!name || !email || !message) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     await query(
-      'INSERT INTO contact_submissions (name, email, phone, message) VALUES ($1, $2, $3, $4)',
-      [name, email, phone || null, message]
+      'INSERT INTO contact_submissions (name, email, phone, subject, message) VALUES ($1, $2, $3, $4, $5)',
+      [name, email, phone || null, subject || null, message]
     );
 
     res.status(201).json({ success: true, message: 'Message sent successfully' });

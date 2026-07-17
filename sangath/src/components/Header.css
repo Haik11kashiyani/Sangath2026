@@ -222,6 +222,30 @@
   gap: 0.8rem;
 }
 
+/* Admin login icon (right side) */
+.header-actions .admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--primary-navy);
+  text-decoration: none;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.header-actions .admin-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(30, 49, 33, 0.06);
+}
+
+.header-actions .admin-link svg {
+  display: block;
+}
+
 .mobile-menu-toggle {
   display: none;
   align-items: center;

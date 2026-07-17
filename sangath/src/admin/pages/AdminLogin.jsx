@@ -4,6 +4,7 @@ import { apiClient } from '../utils/apiClient';
 export function AdminLogin({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -14,40 +15,68 @@ export function AdminLogin({ onLogin }) {
 
     try {
       const response = await apiClient.post('/auth/login', { email, password });
+      localStorage.setItem('adminToken', response.token);
       onLogin(response.token, response.admin);
     } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
+      const message = err.message === 'Failed to fetch'
+        ? 'Cannot reach the API server. Make sure the backend is running at http://localhost:5000'
+        : err.message;
+      setError(message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="admin-login">
-      <div className="login-container">
-        <h1>Sangath Admin</h1>
-        <form onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            disabled={loading}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+    <div className="sys-login-wrapper">
+      <div className="sys-login-container">
+        <div className="sys-login-header">
+          <h1>Sangath Analytics</h1>
+          <p>Sign in to your admin workspace</p>
+        </div>
+
+        <form className="sys-form" onSubmit={handleLogin}>
+          <div className="sys-input-group">
+            <label>Email</label>
+            <input
+              className="sys-input"
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div className="sys-input-group">
+            <label>Password</label>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <input
+                className="sys-input"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className="sys-btn-outline"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" className="sys-btn-primary" disabled={loading}>
+            {loading ? 'Authenticating...' : 'Sign In'}
           </button>
         </form>
-        {error && <div className="error-message">{error}</div>}
+
+        {error && <div className="sys-error-msg">{error}</div>}
       </div>
     </div>
   );

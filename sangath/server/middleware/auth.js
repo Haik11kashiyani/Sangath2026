@@ -1,7 +1,12 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 
 dotenv.config();
+
+export const hashToken = (token) => {
+  return crypto.createHash('sha256').update(token).digest('hex');
+};
 
 export const verifyToken = (req, res, next) => {
   try {

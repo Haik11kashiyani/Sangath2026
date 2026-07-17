@@ -92,8 +92,11 @@ psql -U sangath_user -d sangath_db -f server/migrations/schema.sql
 ### Create First Admin User
 
 ```bash
-node server/scripts/create-admin.js
+cd server
+npm run create-admin
 ```
+
+Then import the generated `admin-user.json` file into PostgreSQL, or use the JSON data to create a user manually.
 
 Or manually:
 ```sql

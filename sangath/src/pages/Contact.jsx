@@ -57,6 +57,7 @@ const handleSubmit = async (e) => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
+        subject: formData.subject,
         message: formData.message
       })
     })

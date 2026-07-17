@@ -43,7 +43,7 @@ export function PageEditor() {
 
   return (
     <div className="page-editor">
-      <h2>📄 Page Editor</h2>
+      <h2> Page Editor</h2>
       <div className="editor-container">
         <div className="pages-list">
           {pages.map((page) => (

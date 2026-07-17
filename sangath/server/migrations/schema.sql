@@ -97,6 +97,7 @@ CREATE TABLE contact_submissions (
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) NOT NULL,
   phone VARCHAR(20),
+  subject VARCHAR(255),
   message TEXT NOT NULL,
   status VARCHAR(50) DEFAULT 'new',
   replied_by UUID REFERENCES admin_users(id),

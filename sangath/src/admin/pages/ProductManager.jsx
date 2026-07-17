@@ -60,7 +60,7 @@ export function ProductManager() {
 
   return (
     <div className="product-manager">
-      <h2>📦 Product Manager</h2>
+      <h2> Product Manager</h2>
       
       <button 
         className="btn btn-primary btn-add"
@@ -69,7 +69,7 @@ export function ProductManager() {
           setFormData({ name: '', description: '', price: '', image_url: '' });
         }}
       >
-        ➕ Add New Product
+        Add New Product
       </button>
       
       {editingProduct !== null && (
@@ -136,13 +136,13 @@ export function ProductManager() {
                   setFormData(product);
                 }}
               >
-                ✏️ Edit
+                Edit
               </button>
               <button 
                 className="btn btn-danger btn-sm"
                 onClick={() => handleDelete(product.id)}
               >
-                🗑️ Delete
+                Delete
               </button>
             </div>
           </div>

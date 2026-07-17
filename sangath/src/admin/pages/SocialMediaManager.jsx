@@ -35,7 +35,7 @@ export function SocialMediaManager() {
 
   return (
     <div className="social-media-manager">
-      <h2>🔗 Social Media Manager</h2>
+      <h2> Social Media Manager</h2>
       <div className="social-links">
         {socialLinks.map((link) => (
           <div key={link.id} className="social-form">
@@ -58,7 +58,7 @@ export function SocialMediaManager() {
               />
             </div>
             <button className="btn btn-primary" onClick={() => handleSave(link)}>
-              💾 Save
+               Save
             </button>
           </div>
         ))}

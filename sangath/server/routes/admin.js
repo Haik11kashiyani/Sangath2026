@@ -1,9 +1,19 @@
 import express from 'express';
+import bcryptjs from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 import { verifyToken } from '../middleware/auth.js';
 import { checkPermission } from '../middleware/rbac.js';
 import { query } from '../config/database.js';
 
 const router = express.Router();
+
+const auditLog = async (adminId, action, resourceType, resourceId, oldValues, newValues, ipAddress) => {
+  await query(
+    `INSERT INTO audit_logs (admin_id, action, resource_type, resource_id, old_values, new_values, ip_address)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [adminId, action, resourceType, resourceId, oldValues || null, newValues || null, ipAddress]
+  );
+};
 
 router.use(verifyToken);
 
@@ -85,6 +95,122 @@ router.delete('/products/:id', checkPermission(['delete_content']), async (req, 
   } catch (error) {
     console.error('Error deleting product:', error);
     res.status(500).json({ error: 'Failed to delete product' });
+  }
+});
+
+// Admin Users
+router.get('/users', checkPermission(['manage_users']), async (req, res) => {
+  try {
+    const result = await query('SELECT id, email, role, status, last_login, created_at FROM admin_users ORDER BY email');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching admin users:', error);
+    res.status(500).json({ error: 'Failed to fetch admin users' });
+  }
+});
+
+router.post('/users', checkPermission(['manage_users']), async (req, res) => {
+  try {
+    const { email, password, role = 'editor', status = 'active' } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const password_hash = bcryptjs.hashSync(password, 12);
+    const id = uuidv4();
+
+    const result = await query(
+      'INSERT INTO admin_users (id, email, password_hash, role, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING id, email, role, status, last_login, created_at',
+      [id, email, password_hash, role, status]
+    );
+
+    await auditLog(req.admin.id, 'create', 'admin_user', result.rows[0].id, null, { email, role, status }, req.ip || req.connection?.remoteAddress);
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    if (error.code === '23505') {
+      return res.status(409).json({ error: 'Admin user with this email already exists' });
+    }
+    console.error('Error creating admin user:', error);
+    res.status(500).json({ error: 'Failed to create admin user' });
+  }
+});
+
+router.put('/users/:id', checkPermission(['manage_users']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, role, status } = req.body;
+    const existing = await query('SELECT id, email, role, status FROM admin_users WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return res.status(404).json({ error: 'Admin user not found' });
+    }
+
+    const oldValues = existing.rows[0];
+    const updatedEmail = email || oldValues.email;
+    const updatedRole = role || oldValues.role;
+    const updatedStatus = status || oldValues.status;
+
+    await query(
+      'UPDATE admin_users SET email = $1, role = $2, status = $3, updated_at = NOW() WHERE id = $4',
+      [updatedEmail, updatedRole, updatedStatus, id]
+    );
+
+    await auditLog(req.admin.id, 'update', 'admin_user', id, oldValues, { email: updatedEmail, role: updatedRole, status: updatedStatus }, req.ip || req.connection?.remoteAddress);
+
+    res.json({ success: true, message: 'Admin user updated' });
+  } catch (error) {
+    if (error.code === '23505') {
+      return res.status(409).json({ error: 'Email address is already in use' });
+    }
+    console.error('Error updating admin user:', error);
+    res.status(500).json({ error: 'Failed to update admin user' });
+  }
+});
+
+router.put('/users/:id/password', checkPermission(['manage_users']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+
+    const existing = await query('SELECT id, email FROM admin_users WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return res.status(404).json({ error: 'Admin user not found' });
+    }
+
+    const password_hash = bcryptjs.hashSync(password, 12);
+    await query('UPDATE admin_users SET password_hash = $1, password_changed_at = NOW(), updated_at = NOW() WHERE id = $2', [password_hash, id]);
+
+    await auditLog(req.admin.id, 'reset_password', 'admin_user', id, null, { email: existing.rows[0].email }, req.ip || req.connection?.remoteAddress);
+
+    res.json({ success: true, message: 'Password updated' });
+  } catch (error) {
+    console.error('Error updating admin password:', error);
+    res.status(500).json({ error: 'Failed to update password' });
+  }
+});
+
+router.delete('/users/:id', checkPermission(['manage_users']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (req.admin.id === id) {
+      return res.status(400).json({ error: 'Cannot delete your own account' });
+    }
+
+    const existing = await query('SELECT id, email FROM admin_users WHERE id = $1', [id]);
+    if (existing.rows.length === 0) {
+      return res.status(404).json({ error: 'Admin user not found' });
+    }
+
+    await query('DELETE FROM admin_users WHERE id = $1', [id]);
+    await auditLog(req.admin.id, 'delete', 'admin_user', id, { email: existing.rows[0].email }, null, req.ip || req.connection?.remoteAddress);
+
+    res.json({ success: true, message: 'Admin user deleted' });
+  } catch (error) {
+    console.error('Error deleting admin user:', error);
+    res.status(500).json({ error: 'Failed to delete admin user' });
   }
 });
 

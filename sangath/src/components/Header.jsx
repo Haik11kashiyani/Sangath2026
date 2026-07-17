@@ -1,4 +1,4 @@
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogIn } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import logo from "../assets/logo.png";
 import './Header.css';
@@ -22,6 +22,8 @@ function Header({ currentPage, setCurrentPage }) {
     { id: 'quality', label: 'Quality', page: 'quality' },
     { id: 'contact', label: 'Contact Us', page: 'contact' }   
   ]
+
+  const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:3001'
 
   return (
     <header className={`header${scrolled ? ' header--scrolled' : ''}`}>
@@ -61,6 +63,16 @@ function Header({ currentPage, setCurrentPage }) {
             </nav>
 
             <div className="header-actions">
+              <a
+                href={ADMIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="admin-link"
+                aria-label="Admin Login"
+                title="Admin Login"
+              >
+                <LogIn size={20} />
+              </a>
               <button 
                 className="mobile-menu-toggle"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
