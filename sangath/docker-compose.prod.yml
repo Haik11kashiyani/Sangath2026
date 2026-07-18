@@ -1,0 +1,95 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: sangath_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-sangath_ie_prod}
+      POSTGRES_USER: ${DB_USER:-sangath_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change_me}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/migrations/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./server/migrations/004_refresh_tokens.sql:/docker-entrypoint-initdb.d/02-refresh_tokens.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-sangath_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sangath_network
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: sangath_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-sangath_ie_prod}
+      DB_USER: ${DB_USER:-sangath_user}
+      DB_PASSWORD: ${DB_PASSWORD:-change_me}
+      API_PORT: 5000
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost}
+      ADMIN_URL: ${ADMIN_URL:-http://localhost/admin}
+      JWT_SECRET: ${JWT_SECRET:-change_me_secret_key_min_32_chars}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change_me_refresh_key_min_32_chars}
+    ports:
+      - "${API_PORT:-5000}:5000"
+    volumes:
+      - ./server:/app/server
+      - ./server/node_modules:/app/server/node_modules
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - sangath_network
+    command: sh -c "npm run seed && node index.js"
+
+  # Frontend (Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: sangath_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./dist:/usr/share/nginx/html/main:ro
+      - ./src/admin/dist:/usr/share/nginx/html/admin:ro
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - sangath_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  sangath_network:
+    driver: bridge
