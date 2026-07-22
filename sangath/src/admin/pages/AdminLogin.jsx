@@ -18,9 +18,9 @@ export function AdminLogin({ onLogin }) {
       localStorage.setItem('adminToken', response.token);
       onLogin(response.token, response.admin);
     } catch (err) {
-      const message = err.message === 'Failed to fetch'
-        ? 'Cannot reach the API server. Make sure the backend is running at http://localhost:5000'
-        : err.message;
+          const message = err.message === 'Failed to fetch'
+            ? 'Cannot reach the API server. Please check the backend deployment and try again.'
+            : err.message;
       setError(message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);

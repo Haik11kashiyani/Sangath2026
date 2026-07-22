@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { API_URL } from '../config/runtime.js'
 import './Products.css'
 
 function Products({ setCurrentPage, onViewDetails }) {
@@ -12,8 +13,6 @@ function Products({ setCurrentPage, onViewDetails }) {
 
   // Load products from API
   useEffect(() => {
-    const API_URL = 'http://localhost:5000/api'
-
     fetch(`${API_URL}/products`)
       .then(res => res.json())
       .then(data => {

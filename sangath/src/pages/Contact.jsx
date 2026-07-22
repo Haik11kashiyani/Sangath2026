@@ -1,5 +1,6 @@
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { API_URL } from '../config/runtime.js'
 import './Contact.css'
 
 
@@ -45,8 +46,6 @@ const handleSubmit = async (e) => {
   setLoading(true)
 
   try {
-    const API_URL = 'http://localhost:5000/api'
-    
     const response = await fetch(`${API_URL}/contact`, {
       method: "POST",
       headers: {

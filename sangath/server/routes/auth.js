@@ -7,14 +7,24 @@ import { generateToken, generateRefreshToken, hashToken } from '../middleware/au
 const router = express.Router();
 
 // Helper to set refresh cookie
-const setRefreshCookie = (res, token) => {
+const getRefreshCookieOptions = () => {
   const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-  res.cookie('refreshToken', token, {
+  const sameSite = process.env.COOKIE_SAMESITE || 'lax';
+  const secure = process.env.COOKIE_SECURE
+    ? process.env.COOKIE_SECURE === 'true'
+    : process.env.NODE_ENV === 'production';
+
+  return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure,
+    sameSite,
+    path: '/',
     maxAge,
-  });
+  };
+};
+
+const setRefreshCookie = (res, token) => {
+  res.cookie('refreshToken', token, getRefreshCookieOptions());
 };
 
 router.post('/login', async (req, res) => {
@@ -113,7 +123,7 @@ router.post('/logout', async (req, res) => {
       await query('UPDATE refresh_tokens SET is_revoked = true WHERE token_hash = $1', [tokenHash]);
     }
 
-    res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken', getRefreshCookieOptions());
     res.json({ success: true });
   } catch (error) {
     console.error('Logout error:', error);

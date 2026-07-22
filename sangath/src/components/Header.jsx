@@ -1,6 +1,7 @@
 import { Menu, X, LogIn } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import logo from "../assets/logo.png";
+import { ADMIN_URL } from '../config/runtime.js';
 import './Header.css';
 
 
@@ -22,8 +23,6 @@ function Header({ currentPage, setCurrentPage }) {
     { id: 'quality', label: 'Quality', page: 'quality' },
     { id: 'contact', label: 'Contact Us', page: 'contact' }   
   ]
-
-  const ADMIN_URL = import.meta.env.VITE_ADMIN_URL || 'http://localhost:3001'
 
   return (
     <header className={`header${scrolled ? ' header--scrolled' : ''}`}>

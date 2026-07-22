@@ -15,10 +15,39 @@ dotenv.config();
 const app = express();
 const PORT = process.env.API_PORT || 5000;
 
+const parseAllowedOrigins = (...values) => {
+  return values
+    .flatMap((value) => (value ? value.split(',') : []))
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .map((value) => {
+      try {
+        return new URL(value).origin;
+      } catch {
+        return value;
+      }
+    })
+    .filter(Boolean);
+};
+
+const allowedOrigins = new Set(
+  parseAllowedOrigins(
+    process.env.ALLOWED_ORIGINS,
+    process.env.FRONTEND_URL,
+    process.env.ADMIN_URL
+  )
+);
+
 // Security Middleware
 app.use(helmet());
 app.use(cors({
-  origin: [process.env.FRONTEND_URL, process.env.ADMIN_URL],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.size === 0 || allowedOrigins.has(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true
 }));
 

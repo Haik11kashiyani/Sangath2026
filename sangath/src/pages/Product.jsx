@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
+import { API_URL } from '../config/runtime.js'
 import './Product.css'
 
 function Product() {
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
-    const API_URL = 'http://localhost:5000/api'
-
     fetch(`${API_URL}/products`)
       .then(res => res.json())
       .then(data => {

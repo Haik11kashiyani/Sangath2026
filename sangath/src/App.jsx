@@ -11,6 +11,7 @@ import Home from './pages/Home'
 import ProductDetail from './pages/ProductDetail'
 import Products from './pages/Products'
 import Quality from './pages/Quality'
+import { API_URL } from './config/runtime.js'
 
 function App() {
   const availablePages = ['home', 'products', 'product-detail', 'about', 'exports-imports', 'quality', 'contact', 'blog', 'careers']
@@ -31,8 +32,6 @@ function App() {
 
   // Load products from API
   useEffect(() => {
-    const API_URL = 'http://localhost:5000/api';
-
     fetch(`${API_URL}/products`)
       .then(res => res.json())
       .then(data => {
