@@ -7,8 +7,9 @@
     "dev": "vite",
     "dev:admin": "vite --config src/admin/vite.config.js",
     "dev:api": "cd server && npm run dev",
-    "build": "vite build",
+    "build:client": "vite build",
     "build:admin": "vite build --config src/admin/vite.config.js",
+    "build": "npm run build:client && npm run build:admin",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:admin": "vite preview --config src/admin/vite.config.js"
