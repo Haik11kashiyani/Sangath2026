@@ -1,0 +1,28 @@
+# Vercel environment variables (Production) — copy these into Vercel Project > Settings > Environments > Production
+# Mark the sensitive ones as "Environment Variable (Secret)"
+
+DATABASE_URL=postgresql://postgres:jiuxib7ysr@db.qypzczxtmowizfzyoppp.supabase.co:5432/postgres
+DB_SSL=true
+
+JWT_SECRET=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+JWT_REFRESH_SECRET=fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+JWT_EXPIRY=24h
+
+FRONTEND_URL=https://sangath-glob-exim-k9ic9583r-sangath-glob-exim.vercel.app
+ADMIN_URL=https://sangath-glob-exim-k9ic9583r-sangath-glob-exim.vercel.app/admin
+ALLOWED_ORIGINS=https://sangath-glob-exim-k9ic9583r-sangath-glob-exim.vercel.app
+
+COOKIE_SECURE=true
+COOKIE_SAMESITE=lax
+
+# Optional (for direct browser access to Supabase). If you want frontend to use Supabase directly, set the ANON key here.
+VITE_SUPABASE_URL=https://qypzczxtmowizfzyoppp.supabase.co
+VITE_SUPABASE_ANON_KEY=
+
+# Optional admin seed (if you run seed scripts in production, be careful)
+ADMIN_EMAIL=export.sangath@gmail.com
+ADMIN_PASSWORD=Ekantik@1008
+
+# Notes:
+# - Do NOT commit `.env.local` to git. Keep secrets only in Vercel or a secure vault.
+# - After adding these env vars to Vercel, redeploy the project and check function logs for any errors.
