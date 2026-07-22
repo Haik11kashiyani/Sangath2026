@@ -1,6 +1,7 @@
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { API_URL } from '../config/runtime.js'
+import { supabase, hasSupabase } from '../config/supabaseClient.js'
 import './Contact.css'
 
 
@@ -46,22 +47,18 @@ const handleSubmit = async (e) => {
   setLoading(true)
 
   try {
-    const response = await fetch(`${API_URL}/contact`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
-      },
-      body: JSON.stringify({
+    if (hasSupabase) {
+      const payload = {
         name: formData.name,
         email: formData.email,
-        phone: formData.phone,
-        subject: formData.subject,
+        phone: formData.phone || null,
+        subject: formData.subject || null,
         message: formData.message
-      })
-    })
+      }
 
-    if (response.ok) {
+      const { error } = await supabase.from('contact_submissions').insert([payload])
+      if (error) throw error
+
       alert("Thank you! Your message has been sent successfully.")
       setFormData({
         name: '',
@@ -71,10 +68,35 @@ const handleSubmit = async (e) => {
         message: ''
       })
     } else {
-      const error = await response.json()
-      alert(error.error || "Error sending message. Please try again.")
-    }
+      const response = await fetch(`${API_URL}/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message
+        })
+      })
 
+      if (response.ok) {
+        alert("Thank you! Your message has been sent successfully.")
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: ''
+        })
+      } else {
+        const error = await response.json()
+        alert(error.error || "Error sending message. Please try again.")
+      }
+    }
   } catch (error) {
     console.error('Error:', error)
     alert("Error sending message. Please check your connection and try again.")

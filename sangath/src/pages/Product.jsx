@@ -1,31 +1,52 @@
 import { useEffect, useState } from 'react'
 import { API_URL } from '../config/runtime.js'
+import { supabase, hasSupabase } from '../config/supabaseClient.js'
 import './Product.css'
 
 function Product() {
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
-    fetch(`${API_URL}/products`)
-      .then(res => res.json())
-      .then(data => {
+    const loadProducts = async () => {
+      try {
+        const data = hasSupabase
+          ? await (async () => {
+              const { data: supaData, error } = await supabase
+                .from('products')
+                .select('*')
+                .eq('is_active', true)
+                .order('display_order', { ascending: true })
+
+              if (error) throw error
+              return supaData || []
+            })()
+          : await fetch(`${API_URL}/products`).then(res => res.json())
+
+        const products = (Array.isArray(data) ? data : []).map(product => ({
+          ...product,
+          image: product.image || product.image_url || ''
+        }))
+
         const groups = {}
-        if (Array.isArray(data)) {
-          data.forEach(product => {
-            const categoryKey = product.category_name || product.category_slug || product.category_id || 'uncategorized'
-            if (!groups[categoryKey]) {
-              groups[categoryKey] = {
-                id: categoryKey,
-                name: product.category_name || product.category_slug || (categoryKey === 'uncategorized' ? 'General' : `Category ${String(categoryKey).substring(0, 8)}`),
-                products: []
-              }
+        products.forEach(product => {
+          const categoryKey = product.category_name || product.category_slug || product.category_id || 'uncategorized'
+          if (!groups[categoryKey]) {
+            groups[categoryKey] = {
+              id: categoryKey,
+              name: product.category_name || product.category_slug || (categoryKey === 'uncategorized' ? 'General' : `Category ${String(categoryKey).substring(0, 8)}`),
+              products: []
             }
-            groups[categoryKey].products.push(product)
-          })
-        }
+          }
+          groups[categoryKey].products.push(product)
+        })
+
         setCategories(Object.values(groups))
-      })
-      .catch(err => console.error('products API load error', err))
+      } catch (err) {
+        console.error('products API or Supabase load error', err)
+      }
+    }
+
+    loadProducts()
   }, [])
 
   return (

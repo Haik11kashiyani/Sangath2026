@@ -14,3 +14,13 @@ export const ADMIN_URL = normalizeUrl(
   import.meta.env.VITE_ADMIN_URL,
   isProduction ? '/admin' : 'http://localhost:3001'
 );
+
+export const SUPABASE_URL = normalizeUrl(
+  import.meta.env.VITE_SUPABASE_URL,
+  ''
+);
+
+export const SUPABASE_ANON_KEY = normalizeUrl(
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  ''
+);
