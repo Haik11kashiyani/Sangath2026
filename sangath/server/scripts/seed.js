@@ -38,6 +38,28 @@ async function seed() {
   
   try {
     console.log('🌱 Starting database seed...\n');
+
+    const existingCounts = await client.query(`
+      SELECT
+        (SELECT COUNT(*)::int FROM admin_users) AS admin_count,
+        (SELECT COUNT(*)::int FROM categories) AS category_count,
+        (SELECT COUNT(*)::int FROM pages) AS page_count,
+        (SELECT COUNT(*)::int FROM site_settings) AS setting_count,
+        (SELECT COUNT(*)::int FROM products) AS product_count
+    `);
+
+    const counts = existingCounts.rows[0];
+
+    if (
+      counts.admin_count > 0 &&
+      counts.category_count > 0 &&
+      counts.page_count > 0 &&
+      counts.setting_count > 0 &&
+      counts.product_count > 0
+    ) {
+      console.log('✅ Seed data already present. Skipping insert operations.\n');
+      return;
+    }
     
     // 1. Create default admin user
     console.log('📝 Creating default admin user...');
@@ -74,10 +96,12 @@ async function seed() {
     
     for (const [key, value] of Object.entries(defaultSettings)) {
       await client.query(
-        `INSERT INTO site_settings (setting_key, setting_value, created_at, updated_at)
-         VALUES ($1, $2, NOW(), NOW())
-         ON CONFLICT (setting_key) DO NOTHING`,
-        [key, value]
+        `INSERT INTO site_settings (key, value, updated_at)
+         VALUES ($1, $2::jsonb, NOW())
+         ON CONFLICT (key) DO UPDATE SET
+           value = EXCLUDED.value,
+           updated_at = NOW()`,
+        [key, JSON.stringify(value)]
       );
     }
     console.log('✅ Site settings created\n');
@@ -85,19 +109,22 @@ async function seed() {
     // 3. Create default categories
     console.log('📂 Creating default categories...');
     const categories = [
-      { name: 'Fresh Produce', description: 'Fresh vegetables and fruits' },
-      { name: 'Grains & Cereals', description: 'Quality grains and cereals' },
-      { name: 'Spices', description: 'Premium quality spices' },
-      { name: 'Organic Products', description: 'Certified organic products' },
-      { name: 'Herbs', description: 'Medicinal and culinary herbs' }
+      { slug: 'fresh-produce', name: 'Fresh Produce', description: 'Fresh vegetables and fruits' },
+      { slug: 'grains-cereals', name: 'Grains & Cereals', description: 'Quality grains and cereals' },
+      { slug: 'spices', name: 'Spices', description: 'Premium quality spices' },
+      { slug: 'organic-products', name: 'Organic Products', description: 'Certified organic products' },
+      { slug: 'herbs', name: 'Herbs', description: 'Medicinal and culinary herbs' }
     ];
     
     for (const cat of categories) {
       await client.query(
-        `INSERT INTO categories (id, name, description, created_at, updated_at)
-         VALUES ($1, $2, $3, NOW(), NOW())
-         ON CONFLICT (name) DO NOTHING`,
-        [uuidv4(), cat.name, cat.description]
+        `INSERT INTO categories (id, slug, name, description, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, NOW(), NOW())
+         ON CONFLICT (slug) DO UPDATE SET
+           name = EXCLUDED.name,
+           description = EXCLUDED.description,
+           updated_at = NOW()`,
+        [uuidv4(), cat.slug, cat.name, cat.description]
       );
     }
     console.log(`✅ ${categories.length} categories created\n`);

@@ -38,15 +38,15 @@ function App() {
         const groups = {};
         if (Array.isArray(data)) {
           data.forEach(product => {
-            const categoryId = product.category_id || 'uncategorized';
-            if (!groups[categoryId]) {
-              groups[categoryId] = {
-                id: categoryId,
-                name: categoryId === 'uncategorized' ? 'General' : `Category ${categoryId.substring(0, 8)}`,
+            const categoryKey = product.category_name || product.category_slug || product.category_id || 'uncategorized';
+            if (!groups[categoryKey]) {
+              groups[categoryKey] = {
+                id: categoryKey,
+                name: product.category_name || product.category_slug || (categoryKey === 'uncategorized' ? 'General' : `Category ${String(categoryKey).substring(0, 8)}`),
                 products: []
               };
             }
-            groups[categoryId].products.push(product);
+            groups[categoryKey].products.push(product);
           });
         }
 
