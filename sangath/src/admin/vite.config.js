@@ -14,7 +14,7 @@ export default defineConfig({
     host: '0.0.0.0'
   },
   build: {
-    outDir: path.resolve(__dirname, '../dist/admin'),
+    outDir: path.resolve(__dirname, '../../dist/admin'),
     emptyOutDir: true,
     rollupOptions: {
       input: path.resolve(__dirname, 'index.html')
