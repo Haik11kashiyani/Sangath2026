@@ -65,7 +65,45 @@ const loginLimiter = rateLimit({
 });
 
 // Body Parser
-app.use(express.json({ limit: '50mb' }));
+app.use(express.raw({ type: 'application/json', limit: '50mb' }));
+app.use((req, res, next) => {
+  if (!req.is('application/json')) {
+    return next();
+  }
+
+  const rawBody = req.body;
+  if (!Buffer.isBuffer(rawBody) || rawBody.length === 0) {
+    req.body = {};
+    return next();
+  }
+
+  let text;
+  if (rawBody[0] === 0xfe && rawBody[1] === 0xff) {
+    // UTF-16 BE
+    const swapped = Buffer.from(rawBody);
+    for (let i = 0; i + 1 < swapped.length; i += 2) {
+      const a = swapped[i];
+      swapped[i] = swapped[i + 1];
+      swapped[i + 1] = a;
+    }
+    text = swapped.toString('utf16le');
+  } else if (rawBody[0] === 0xff && rawBody[1] === 0xfe) {
+    // UTF-16 LE
+    text = rawBody.toString('utf16le');
+  } else {
+    text = rawBody.toString('utf8');
+  }
+
+  text = text.replace(/^\uFEFF/, '').trim();
+
+  try {
+    req.body = text ? JSON.parse(text) : {};
+  } catch (parseError) {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+
+  next();
+});
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
 
