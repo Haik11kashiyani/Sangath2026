@@ -32,7 +32,9 @@ const allowedOrigins = new Set(
   parseAllowedOrigins(
     process.env.ALLOWED_ORIGINS,
     process.env.FRONTEND_URL,
-    process.env.ADMIN_URL
+    process.env.ADMIN_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null
   )
 );
 
@@ -41,7 +43,12 @@ app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      if (allowedOrigins.size === 0 || allowedOrigins.has(origin)) {
+      if (
+        allowedOrigins.size === 0 ||
+        allowedOrigins.has('*') ||
+        allowedOrigins.has(origin) ||
+        (typeof origin === 'string' && origin.endsWith('.vercel.app'))
+      ) {
         return callback(null, true);
       }
       return callback(new Error(`CORS blocked for origin: ${origin}`));
