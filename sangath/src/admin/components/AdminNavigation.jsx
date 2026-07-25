@@ -60,77 +60,63 @@ export function AdminNavigation({
   contactCount
 }) {
   return (
-    <nav className={`sys-sidebar ${collapsed ? 'sys-sidebar--collapsed' : ''}`}>
-      <div className="sys-sidebar-header">
-        <div className="sys-sidebar-brand" style={{ display: collapsed ? 'none' : 'block' }}>
-          <div className="sys-brand-title">SANGATH</div>
-          <div className="sys-brand-subtitle">ADMIN CONSOLE</div>
-        </div>
-        <button 
-          className="sys-btn sys-btn--icon sys-sidebar-toggle"
-          onClick={onToggleCollapse}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <Icons.ChevronRight /> : <Icons.ChevronLeft />}
-        </button>
+    <aside className={`sys-sidebar ${collapsed ? 'collapsed' : ''}`}>
+      {/* Brand */}
+      <div className="sys-brand">
+        <span>SANGATH</span>
       </div>
+      
+      {/* Toggle */}
+      <button className="sys-sidebar-toggle" onClick={onToggleCollapse} title={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
+        {collapsed ? <Icons.ChevronRight /> : <Icons.ChevronLeft />}
+      </button>
 
-      <div className="sys-sidebar-content">
+      {/* Navigation */}
+      <nav className="sys-nav">
         {navigationConfig.map((section, idx) => (
-          <div key={idx} className="sys-sidebar-section">
-            {!collapsed && <div className="sys-sidebar-section-title">{section.title}</div>}
-            
-            <ul className="sys-sidebar-nav-list">
-              {section.items.map(item => {
-                const isActive = currentPage === item.id;
-                const Icon = item.icon;
-                
-                return (
-                  <li key={item.id} className="sys-sidebar-nav-item">
-                    <button
-                      className={`sys-sidebar-nav-link ${isActive ? 'sys-sidebar-nav-link--active' : ''}`}
-                      onClick={() => onSelect(item.id)}
-                      title={collapsed ? item.label : undefined}
-                    >
-                      <span className="sys-sidebar-nav-icon"><Icon /></span>
-                      {!collapsed && (
-                        <span className="sys-sidebar-nav-label">
-                          {item.label}
-                          {item.hasBadge && contactCount > 0 && (
-                            <Badge variant="primary" style={{ marginLeft: 'auto' }}>{contactCount}</Badge>
-                          )}
-                        </span>
-                      )}
-                      {collapsed && item.hasBadge && contactCount > 0 && (
-                        <span className="sys-sidebar-nav-badge-dot"></span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
+          <div key={idx} className="sys-nav-section">
+            <div className="sys-nav-section-title">{section.title}</div>
+            {section.items.map(item => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  className={`sys-nav-item ${currentPage === item.id ? 'is-active' : ''}`}
+                  onClick={() => onSelect(item.id)}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <span className="sys-nav-icon"><Icon /></span>
+                  <span>{item.label}</span>
+                  {item.hasBadge && contactCount > 0 && (
+                    <span className="sys-nav-badge">{contactCount}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         ))}
-      </div>
+      </nav>
 
+      {/* Footer */}
       <div className="sys-sidebar-footer">
         {!collapsed && admin && (
-          <div className="sys-sidebar-admin-info">
-            <div className="sys-sidebar-admin-email" title={admin.email}>
+          <div style={{ padding: '0 1.5rem', marginBottom: '1rem' }}>
+            <div style={{ fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis' }} title={admin.email}>
               {admin.email?.length > 20 ? admin.email.substring(0, 17) + '...' : admin.email}
             </div>
-            <Badge variant="neutral" className="sys-sidebar-admin-role">{admin.role || 'Admin'}</Badge>
+            <Badge variant="neutral" style={{ marginTop: '0.25rem' }}>{admin.role || 'Admin'}</Badge>
           </div>
         )}
         <button 
-          className="sys-sidebar-logout-btn" 
+          className="sys-nav-item" 
           onClick={onLogout}
           title={collapsed ? "Logout" : undefined}
+          style={{ width: '100%', color: 'inherit' }}
         >
-          <span className="sys-sidebar-nav-icon"><Icons.Logout /></span>
-          {!collapsed && <span className="sys-sidebar-nav-label">Logout</span>}
+          <span className="sys-nav-icon"><Icons.Logout /></span>
+          <span>Logout</span>
         </button>
       </div>
-    </nav>
+    </aside>
   );
 }

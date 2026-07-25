@@ -48,23 +48,23 @@ function AdminDashboard({ admin }) {
       </div>
 
       <div className="sys-stats-grid">
-        <div className="sys-stat-card">
+        <div className="sys-card sys-stat-card">
           <div className="sys-stat-label">Products</div>
           <div className="sys-stat-value">{loading ? '-' : stats.products}</div>
         </div>
-        <div className="sys-stat-card">
+        <div className="sys-card sys-stat-card">
           <div className="sys-stat-label">Categories</div>
           <div className="sys-stat-value">{loading ? '-' : stats.categories}</div>
         </div>
-        <div className="sys-stat-card">
+        <div className="sys-card sys-stat-card">
           <div className="sys-stat-label">Pages</div>
           <div className="sys-stat-value">{loading ? '-' : stats.pages}</div>
         </div>
-        <div className="sys-stat-card">
+        <div className="sys-card sys-stat-card">
           <div className="sys-stat-label">Users</div>
           <div className="sys-stat-value">{loading ? '-' : stats.users}</div>
         </div>
-        <div className="sys-stat-card">
+        <div className="sys-card sys-stat-card">
           <div className="sys-stat-label">Contacts</div>
           <div className="sys-stat-value">{loading ? '-' : stats.contacts}</div>
         </div>
@@ -75,7 +75,7 @@ function AdminDashboard({ admin }) {
         {loading ? (
           <div className="sys-loading-text">Loading...</div>
         ) : (
-          <div className="sys-activity-list">
+          <div className="sys-activity-feed">
             {stats.recentActivity?.length > 0 ? (
               stats.recentActivity.map((log, i) => (
                 <div key={i} className="sys-activity-item">
@@ -188,13 +188,13 @@ export function AdminLayout({ admin, onLogout }) {
             {admin && (
               <div className="sys-admin-profile">
                 <Badge variant="primary" className="sys-role-badge">{admin.role || 'Admin'}</Badge>
-                <div className="sys-admin-avatar">{getInitials(admin.email)}</div>
+                <div className="sys-avatar">{getInitials(admin.email)}</div>
               </div>
             )}
           </div>
         </header>
         
-        <div className="sys-content-area">
+        <div className="sys-main-content">
           {renderPage()}
         </div>
       </main>
