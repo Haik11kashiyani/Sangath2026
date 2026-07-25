@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
 import Badge from '../components/Badge';
 import EmptyState from '../components/EmptyState';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 
 export function ContactManager() {
   const [submissions, setSubmissions] = useState([]);
@@ -121,7 +122,7 @@ export function ContactManager() {
         {/* Left Pane: List */}
         <div className="sys-inbox-list" style={{ width: '35%', borderRight: '1px solid var(--sys-color-border)', overflowY: 'auto' }}>
           {loading ? (
-            <div className="sys-p-4"><div className="sys-skeleton" style={{ height: '100%' }}></div></div>
+            <div className="sys-p-4"><SkeletonLoader type="text" count={3} /></div>
           ) : filteredSubmissions.length === 0 ? (
             <div className="sys-p-6 sys-text-center sys-text-muted">No submissions found.</div>
           ) : (

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '../utils/apiClient';
 import { useToast } from '../components/Toast';
 import Badge from '../components/Badge';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 
 export function AuditLog() {
   const [logs, setLogs] = useState([]);
@@ -105,7 +106,7 @@ export function AuditLog() {
 
       <div className="sys-activity-feed sys-card">
         {loading ? (
-          <div className="sys-skeleton" style={{ height: '300px' }}></div>
+          <SkeletonLoader type="table" />
         ) : logs.length === 0 ? (
           <div className="sys-text-center sys-p-6 sys-text-muted">No activity logs found.</div>
         ) : (

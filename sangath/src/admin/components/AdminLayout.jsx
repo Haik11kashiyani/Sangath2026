@@ -11,6 +11,7 @@ import { AuditLog } from '../pages/AuditLog';
 import Badge from './Badge';
 import { useToast } from './Toast';
 import { apiClient } from '../utils/apiClient';
+import { CommandPalette } from './CommandPalette';
 
 // Basic inline AdminDashboard component
 function AdminDashboard({ admin }) {
@@ -98,6 +99,18 @@ export function AdminLayout({ admin, onLogout }) {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [contactCount, setContactCount] = useState(0);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsPaletteOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     // Fetch unread contact submissions
@@ -184,6 +197,10 @@ export function AdminLayout({ admin, onLogout }) {
               {getPageTitle(currentPage)}
             </div>
           </div>
+          <div className="sys-header-search" onClick={() => setIsPaletteOpen(true)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.03)', padding: '0.375rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)', fontSize: '13px', marginLeft: '2rem' }}>
+             <span style={{ fontSize: '11px' }}>Search or jump to...</span>
+             <kbd style={{ background: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', border: '1px solid var(--border-strong)' }}>⌘K</kbd>
+          </div>
           <div className="sys-header-right">
             {admin && (
               <div className="sys-admin-profile">
@@ -198,6 +215,12 @@ export function AdminLayout({ admin, onLogout }) {
           {renderPage()}
         </div>
       </main>
+
+      <CommandPalette 
+        isOpen={isPaletteOpen} 
+        onClose={() => setIsPaletteOpen(false)} 
+        onNavigate={(page) => setCurrentPage(page)} 
+      />
     </div>
   );
 }

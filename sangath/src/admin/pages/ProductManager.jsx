@@ -6,6 +6,7 @@ import DataTable from '../components/DataTable';
 import Badge from '../components/Badge';
 import Toggle from '../components/Toggle';
 import EmptyState from '../components/EmptyState';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 
 export function ProductManager() {
   const [products, setProducts] = useState([]);
@@ -231,7 +232,7 @@ export function ProductManager() {
 
       <div className="sys-card sys-glass sys-p-4 sys-rounded-lg sys-border sys-border-white-10">
         {loading ? (
-          <div className="sys-p-8 sys-text-center sys-text-muted">Loading products...</div>
+          <SkeletonLoader type="table" />
         ) : filteredProducts.length === 0 ? (
           <EmptyState title="No products found" description="Try adjusting your filters or create a new product." />
         ) : (

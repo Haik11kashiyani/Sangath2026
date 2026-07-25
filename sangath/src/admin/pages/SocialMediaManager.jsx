@@ -5,6 +5,7 @@ import Badge from '../components/Badge';
 import Toggle from '../components/Toggle';
 import EmptyState from '../components/EmptyState';
 import { apiClient } from '../utils/apiClient';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 
 const Icons = {
   Facebook: (
@@ -212,7 +213,7 @@ export function SocialMediaManager() {
       </div>
 
       {loading ? (
-        <div className="sys-loading-spinner" />
+        <SkeletonLoader type="card" count={4} />
       ) : links.length === 0 ? (
         <EmptyState 
           title="No Social Media Links"

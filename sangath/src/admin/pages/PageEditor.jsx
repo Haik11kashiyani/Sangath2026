@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
 import Badge from '../components/Badge';
 import Toggle from '../components/Toggle';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 
 export function PageEditor() {
   const [pages, setPages] = useState([]);
@@ -117,7 +118,7 @@ export function PageEditor() {
         </div>
         <div className="sys-flex-1 sys-overflow-y-auto sys-p-2 sys-space-y-1">
           {loading ? (
-            <div className="sys-text-center sys-p-4 sys-text-muted sys-text-sm">Loading...</div>
+            <div className="sys-p-4"><SkeletonLoader type="text" count={3} /></div>
           ) : pages.length === 0 ? (
             <div className="sys-text-center sys-p-4 sys-text-muted sys-text-sm">No pages found.</div>
           ) : (

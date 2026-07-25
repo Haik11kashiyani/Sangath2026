@@ -1,24 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Colors - Base */
-  --bg-primary: #060b18;
-  --bg-secondary: #0a1628;
-  --bg-tertiary: #0f1d32;
-  --bg-hover: #132743;
-  --bg-active: #1a3356;
+  /* Colors - Base (Z-Axis Elevation) */
+  --bg-root: #040812;          /* Absolute bottom layer */
+  --bg-primary: #080d19;       /* Main canvas */
+  --bg-secondary: #0d1424;     /* Elevated surface (Cards) */
+  --bg-tertiary: #131b2e;      /* Popovers, Dropdowns, Modals */
+  --bg-hover: #1a243a;
+  --bg-active: #222d46;
 
-  /* Colors - Borders */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.1);
-  --border-strong: rgba(255, 255, 255, 0.15);
+  /* Colors - Borders (Sub-pixel precise) */
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.12);
   --border-focus: #10b981;
+  --border-subpixel: 0 0 0 0.5px rgba(255, 255, 255, 0.06);
 
   /* Colors - Text */
-  --text-primary: #f0f4f8;
-  --text-secondary: #8899a6;
-  --text-muted: #546a7b;
-  --text-inverse: #060b18;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #040812;
 
   /* Colors - Accents */
   --accent-primary: #10b981;
@@ -37,17 +39,22 @@
   /* Typography */
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --tracking-tight: -0.02em;
+  --tracking-base: -0.01em;
+  --tracking-mono: 0em;
   
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+  /* Shadows (Multi-layered Elite) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), var(--border-subpixel);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.3), var(--border-subpixel);
+  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.6), 0 8px 12px -2px rgba(0, 0, 0, 0.4), var(--border-subpixel);
+  --shadow-xl: 0 24px 48px -8px rgba(0, 0, 0, 0.8), 0 12px 24px -4px rgba(0, 0, 0, 0.5), var(--border-subpixel);
 
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  /* Transitions (GPU Accelerated) */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 150ms var(--ease-smooth);
+  --transition-normal: 250ms var(--ease-spring);
+  --transition-slow: 350ms var(--ease-spring);
   
   /* Radii */
   --radius-sm: 4px;
@@ -63,6 +70,7 @@
   --z-dropdown: 100;
   --z-modal: 200;
   --z-toast: 300;
+  --z-palette: 400;
 }
 
 /* ==========================================================================
@@ -90,14 +98,15 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: var(--text-primary);
-  background-color: var(--bg-primary);
+  background-color: var(--bg-root);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: var(--tracking-base);
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
-  letter-spacing: -0.025em;
+  letter-spacing: var(--tracking-tight);
   margin-top: 0;
   margin-bottom: 0.5rem;
   color: var(--text-primary);
@@ -137,10 +146,10 @@ a:hover {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background-color: var(--bg-primary);
+  background-color: var(--bg-root);
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.04), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(20, 184, 166, 0.04), transparent 25%);
+    radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.03), transparent 30%),
+    radial-gradient(circle at 85% 30%, rgba(20, 184, 166, 0.03), transparent 30%);
 }
 
 .sys-viewport {
@@ -152,16 +161,17 @@ a:hover {
 }
 
 .sys-header-bar {
-  height: 64px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem;
-  background: rgba(10, 22, 40, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(8, 13, 25, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-subtle);
   z-index: var(--z-header);
+  box-shadow: var(--shadow-sm);
 }
 
 .sys-main-content {
@@ -188,10 +198,10 @@ a:hover {
    Sidebar
    ========================================================================== */
 .sys-sidebar {
-  width: 280px;
-  background: rgba(10, 22, 40, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  width: 260px;
+  background: rgba(13, 20, 36, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-right: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
@@ -200,15 +210,15 @@ a:hover {
 }
 
 .sys-sidebar.collapsed {
-  width: 72px;
+  width: 68px;
 }
 
 .sys-brand {
-  height: 64px;
+  height: 56px;
   display: flex;
   align-items: center;
-  padding: 0 1.5rem;
-  font-size: 1.25rem;
+  padding: 0 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-subtle);
@@ -342,21 +352,19 @@ a:hover {
    Cards
    ========================================================================== */
 .sys-card {
-  background: rgba(15, 29, 50, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border-subtle);
+  background: var(--bg-secondary);
+  border: none;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  contain: layout paint;
 }
 .sys-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
-  border-color: var(--border-default);
 }
 
 .sys-card-header {
@@ -1516,5 +1524,174 @@ a:hover {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+}
+
+/* ==========================================================================
+   Command Palette (Elite UI)
+   ========================================================================== */
+.sys-palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 8, 18, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  z-index: var(--z-palette);
+  animation: fadeIn var(--transition-fast);
+}
+
+.sys-palette-container {
+  width: 100%;
+  max-width: 640px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  box-shadow: var(--shadow-xl);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideInDown var(--transition-fast);
+  will-change: transform, opacity;
+}
+
+.sys-palette-input-wrap {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sys-palette-icon {
+  color: var(--text-muted);
+  margin-right: 1rem;
+}
+
+.sys-palette-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 1.125rem;
+  outline: none;
+  letter-spacing: var(--tracking-base);
+}
+
+.sys-palette-input::placeholder {
+  color: var(--text-muted);
+}
+
+.sys-palette-body {
+  padding: 0.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.sys-palette-group-label {
+  padding: 0.75rem 1rem 0.25rem;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.sys-palette-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin: 0.25rem 0;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.sys-palette-item:hover,
+.sys-palette-item.active {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.sys-palette-item-icon {
+  margin-right: 1rem;
+  display: flex;
+}
+
+.sys-palette-item-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sys-palette-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.sys-palette-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.125rem 0.375rem;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--text-secondary);
+  box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+}
+
+@keyframes slideInDown {
+  from { transform: translateY(-16px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   Skeleton Loaders (Elite UI)
+   ========================================================================== */
+.sys-skeleton-elite {
+  position: relative;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+.sys-skeleton-elite::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+  animation: shimmerElite 1.5s infinite;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+@keyframes shimmerElite {
+  100% {
+    transform: translateX(100%);
   }
 }

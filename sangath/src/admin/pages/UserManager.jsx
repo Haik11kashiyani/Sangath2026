@@ -3,6 +3,7 @@ import { apiClient } from '../utils/apiClient';
 import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
 import Badge from '../components/Badge';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 
 export function UserManager() {
   const [users, setUsers] = useState([]);
@@ -163,7 +164,7 @@ export function UserManager() {
 
       <div className="sys-card sys-table-wrapper">
         {loading ? (
-          <div className="sys-skeleton" style={{ height: '200px' }}></div>
+          <SkeletonLoader type="table" />
         ) : (
           <table className="sys-table">
             <thead>

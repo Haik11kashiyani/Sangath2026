@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast';
 import Modal from '../components/Modal';
 import DataTable from '../components/DataTable';
 import EmptyState from '../components/EmptyState';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 
 export function CategoryManager() {
   const [categories, setCategories] = useState([]);
@@ -129,7 +130,7 @@ export function CategoryManager() {
 
       <div className="sys-card sys-glass sys-p-4 sys-rounded-lg sys-border sys-border-white-10">
         {loading ? (
-          <div className="sys-p-8 sys-text-center sys-text-muted">Loading categories...</div>
+          <SkeletonLoader type="table" />
         ) : categories.length === 0 ? (
           <EmptyState title="No categories found" description="Create your first category to get started." />
         ) : (

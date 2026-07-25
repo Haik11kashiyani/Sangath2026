@@ -5,6 +5,7 @@ import Modal from '../components/Modal';
 import Badge from '../components/Badge';
 import Toggle from '../components/Toggle';
 import EmptyState from '../components/EmptyState';
+import { SkeletonLoader } from '../components/SkeletonLoader';
 
 const TABS = [
   { id: 'branding', label: 'Branding' },
@@ -70,7 +71,7 @@ export function SiteSettings() {
             <p className="sys-page-subtitle">Complete control over your business</p>
           </div>
         </div>
-        <div className="sys-skeleton sys-card" style={{ height: '400px' }}></div>
+        <SkeletonLoader type="text" count={3} />
       </div>
     );
   }
