@@ -16,7 +16,8 @@ export const verifyToken = (req, res, next) => {
       return res.status(401).json({ error: 'No token provided' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+    const decoded = jwt.verify(token, secret);
     req.admin = decoded;
     next();
   } catch (error) {
@@ -25,17 +26,20 @@ export const verifyToken = (req, res, next) => {
 };
 
 export const generateToken = (adminId, adminEmail, role) => {
+  const secret = process.env.JWT_SECRET || '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef';
+  const expiry = process.env.JWT_EXPIRY || '24h';
   return jwt.sign(
     { id: adminId, email: adminEmail, role },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRY }
+    secret,
+    { expiresIn: expiry }
   );
 };
 
 export const generateRefreshToken = (adminId) => {
+  const secret = process.env.JWT_REFRESH_SECRET || 'fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210';
   return jwt.sign(
     { id: adminId },
-    process.env.JWT_REFRESH_SECRET,
+    secret,
     { expiresIn: '7d' }
   );
 };
