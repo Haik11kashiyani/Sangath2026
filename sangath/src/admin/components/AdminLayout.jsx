@@ -1,67 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AdminNavigation } from './AdminNavigation';
-import { PageEditor } from '../pages/PageEditor';
 import { ProductManager } from '../pages/ProductManager';
-import { SocialMediaManager } from '../pages/SocialMediaManager';
+import { CategoryManager } from '../pages/CategoryManager';
+import { PageEditor } from '../pages/PageEditor';
 import { SiteSettings } from '../pages/SiteSettings';
+import { SocialMediaManager } from '../pages/SocialMediaManager';
 import { UserManager } from '../pages/UserManager';
+import { ContactManager } from '../pages/ContactManager';
+import { AuditLog } from '../pages/AuditLog';
+import Badge from './Badge';
+import { useToast } from './Toast';
+import { apiClient } from '../utils/apiClient';
 
-export function AdminDashboard({ admin }) {
+// Basic inline AdminDashboard component
+function AdminDashboard({ admin }) {
+  const [stats, setStats] = useState({ products: 0, categories: 0, pages: 0, users: 0, contacts: 0, recentActivity: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const data = await apiClient.get('/admin/dashboard/stats');
+        if (data) {
+          setStats({
+            products: data.products || 0,
+            categories: data.categories || 0,
+            pages: data.pages || 0,
+            users: data.users || 0,
+            contacts: data.submissions?.total || 0,
+            recentActivity: data.recentActivity || []
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard stats', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="sys-dashboard">
-      <header className="sys-header">
-        <div className="sys-header-meta">
-          <span className="sys-status-dot"></span>
-          SYS_STATUS // ADMIN_ACTIVE // LEVEL: {admin?.role}
-        </div>
-        <h1 className="sys-title">System Overview</h1>
-        <p className="sys-subtitle">Session active under {admin?.email}</p>
-      </header>
-      
-      <div className="sys-bento">
-        <div className="sys-card">
-          <div className="sys-card-top">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-            <span className="sys-card-id">IDX // 001</span>
-          </div>
-          <div className="sys-card-bottom">
-            <h3>Inventory</h3>
-            <p>Manage product catalog structural parameters.</p>
-          </div>
-        </div>
+      <div className="sys-page-header">
+        <h1 className="sys-page-title">Dashboard</h1>
+        <p className="sys-page-subtitle">Welcome back, {admin?.email}</p>
+      </div>
 
-        <div className="sys-card">
-          <div className="sys-card-top">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            <span className="sys-card-id">IDX // 002</span>
-          </div>
-          <div className="sys-card-bottom">
-            <h3>Content</h3>
-            <p>Control structural text layers and pages.</p>
-          </div>
+      <div className="sys-stats-grid">
+        <div className="sys-stat-card">
+          <div className="sys-stat-label">Products</div>
+          <div className="sys-stat-value">{loading ? '-' : stats.products}</div>
         </div>
+        <div className="sys-stat-card">
+          <div className="sys-stat-label">Categories</div>
+          <div className="sys-stat-value">{loading ? '-' : stats.categories}</div>
+        </div>
+        <div className="sys-stat-card">
+          <div className="sys-stat-label">Pages</div>
+          <div className="sys-stat-value">{loading ? '-' : stats.pages}</div>
+        </div>
+        <div className="sys-stat-card">
+          <div className="sys-stat-label">Users</div>
+          <div className="sys-stat-value">{loading ? '-' : stats.users}</div>
+        </div>
+        <div className="sys-stat-card">
+          <div className="sys-stat-label">Contacts</div>
+          <div className="sys-stat-value">{loading ? '-' : stats.contacts}</div>
+        </div>
+      </div>
 
-        <div className="sys-card">
-          <div className="sys-card-top">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-            <span className="sys-card-id">IDX // 003</span>
+      <div className="sys-dashboard-activity">
+        <h2 className="sys-section-title">Recent Activity</h2>
+        {loading ? (
+          <div className="sys-loading-text">Loading...</div>
+        ) : (
+          <div className="sys-activity-list">
+            {stats.recentActivity?.length > 0 ? (
+              stats.recentActivity.map((log, i) => (
+                <div key={i} className="sys-activity-item">
+                  <span className="sys-activity-action">{log.action}</span>
+                  <span className="sys-activity-user">{log.admin_email}</span>
+                  <span className="sys-activity-time">{new Date(log.created_at).toLocaleString()}</span>
+                </div>
+              ))
+            ) : (
+              <div className="sys-empty-text">No recent activity</div>
+            )}
           </div>
-          <div className="sys-card-bottom">
-            <h3>Network</h3>
-            <p>Map external hyper-routing connections.</p>
-          </div>
-        </div>
-
-        <div className="sys-card">
-          <div className="sys-card-top">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            <span className="sys-card-id">IDX // 004</span>
-          </div>
-          <div className="sys-card-bottom">
-            <h3>System</h3>
-            <p>Configure internal platform constants.</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -69,29 +96,107 @@ export function AdminDashboard({ admin }) {
 
 export function AdminLayout({ admin, onLogout }) {
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [contactCount, setContactCount] = useState(0);
+
+  useEffect(() => {
+    // Fetch unread contact submissions
+    const fetchContactCount = async () => {
+      try {
+        const res = await apiClient.get('/admin/contact-submissions');
+        const data = res;
+        if (Array.isArray(data)) {
+          setContactCount(data.filter(c => c.status === 'new').length);
+        }
+      } catch (err) {
+        console.error('Failed to fetch contact count', err);
+      }
+    };
+    
+    // Only fetch if token exists
+    const token = localStorage.getItem('adminToken');
+    if (token) {
+      fetchContactCount();
+    }
+  }, []);
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'pages':
-        return <PageEditor />;
+      case 'dashboard':
+        return <AdminDashboard admin={admin} />;
       case 'products':
         return <ProductManager />;
-      case 'users':
-        return <UserManager />;
-      case 'social-media':
-        return <SocialMediaManager />;
+      case 'categories':
+        return <CategoryManager />;
+      case 'pages':
+        return <PageEditor />;
       case 'settings':
         return <SiteSettings />;
+      case 'social-media':
+        return <SocialMediaManager />;
+      case 'users':
+        return <UserManager />;
+      case 'contacts':
+        return <ContactManager />;
+      case 'audit-logs':
+        return <AuditLog />;
       default:
         return <AdminDashboard admin={admin} />;
     }
   };
 
+  const getPageTitle = (page) => {
+    const titles = {
+      'dashboard': 'Dashboard',
+      'products': 'Products',
+      'categories': 'Categories',
+      'pages': 'Pages',
+      'settings': 'Site Settings',
+      'social-media': 'Social Media',
+      'users': 'Users',
+      'contacts': 'Contacts',
+      'audit-logs': 'Audit Log'
+    };
+    return titles[page] || 'Dashboard';
+  };
+
+  const getInitials = (email) => {
+    if (!email) return 'A';
+    return email.charAt(0).toUpperCase();
+  };
+
   return (
     <div className="sys-root">
-      <AdminNavigation currentPage={currentPage} onSelect={setCurrentPage} onLogout={onLogout} />
+      <AdminNavigation
+        currentPage={currentPage}
+        onSelect={setCurrentPage}
+        onLogout={onLogout}
+        admin={admin}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        contactCount={contactCount}
+      />
+      
       <main className="sys-viewport">
-        {renderPage()}
+        <header className="sys-header-bar">
+          <div className="sys-header-left">
+            <div className="sys-breadcrumb">
+              {getPageTitle(currentPage)}
+            </div>
+          </div>
+          <div className="sys-header-right">
+            {admin && (
+              <div className="sys-admin-profile">
+                <Badge variant="primary" className="sys-role-badge">{admin.role || 'Admin'}</Badge>
+                <div className="sys-admin-avatar">{getInitials(admin.email)}</div>
+              </div>
+            )}
+          </div>
+        </header>
+        
+        <div className="sys-content-area">
+          {renderPage()}
+        </div>
       </main>
     </div>
   );

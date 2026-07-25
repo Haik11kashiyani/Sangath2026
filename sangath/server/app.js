@@ -38,7 +38,7 @@ const allowedOrigins = new Set(
   )
 );
 
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -59,9 +59,16 @@ app.use(
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 200,
 });
 app.use('/api/', limiter);
+
+const writeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  skip: (req) => req.method === 'GET',
+});
+app.use('/api/admin', writeLimiter);
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -69,7 +76,7 @@ const loginLimiter = rateLimit({
   skip: (req) => req.method !== 'POST',
 });
 
-app.use(express.raw({ type: 'application/json', limit: '50mb' }));
+app.use(express.raw({ type: 'application/json', limit: '2mb' }));
 app.use((req, res, next) => {
   if (!req.is('application/json')) {
     return next();
@@ -109,8 +116,19 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.urlencoded({ limit: '2mb', extended: true }));
 app.use(cookieParser());
+
+import crypto from 'crypto';
+app.use((req, res, next) => {
+  res.setHeader('X-Request-ID', crypto.randomUUID());
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Cache-Control', 'no-transform');
+  next();
+});
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

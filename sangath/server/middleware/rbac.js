@@ -4,8 +4,8 @@ export const checkPermission = (requiredPermissions = []) => {
 
     const permissions = {
       super_admin: ['*'],
-      editor: ['create_content', 'edit_content', 'delete_content', 'view_audit'],
-      viewer: ['view_content', 'view_audit']
+      editor: ['create_content', 'edit_content', 'delete_content', 'view_content', 'view_audit'],
+      viewer: ['view_content', 'view_audit', 'view_users']
     };
 
     const rolePermissions = permissions[role] || [];
