@@ -72,6 +72,18 @@
   box-sizing: border-box;
 }
 
+.sys-root button {
+  background: transparent;
+  color: inherit;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+
 body {
   margin: 0;
   font-family: var(--font-ui);
@@ -243,24 +255,33 @@ a:hover {
 .sys-nav-item {
   display: flex;
   align-items: center;
+  width: 100%;
   padding: 0.625rem 1.5rem;
   color: var(--text-secondary);
+  background: transparent !important;
+  border: none !important;
+  border-left: 3px solid transparent !important;
+  border-radius: 0 !important;
+  font-family: var(--font-ui);
+  font-size: 14px;
   text-decoration: none;
+  text-align: left;
   transition: all var(--transition-fast);
   cursor: pointer;
   position: relative;
   white-space: nowrap;
-  border-left: 3px solid transparent;
+  outline: none;
+  box-shadow: none !important;
 }
 .sys-nav-item:hover {
   color: var(--text-primary);
-  background: var(--bg-hover);
+  background: var(--bg-hover) !important;
 }
 .sys-nav-item.is-active {
   color: var(--accent-primary);
-  background: rgba(16, 185, 129, 0.05);
-  border-left-color: var(--accent-primary);
-  font-weight: 500;
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-left-color: var(--accent-primary) !important;
+  font-weight: 600;
 }
 
 .sys-nav-icon {
