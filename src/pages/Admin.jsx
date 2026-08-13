@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { 
   LayoutDashboard, 
   Tag, 
@@ -2324,7 +2324,7 @@ function Admin({
                 </thead>
                 <tbody>
                   {menuItems.map((item, index) => (
-                    <React.Fragment key={item.id}>
+                    <Fragment key={item.id}>
                       <tr>
                         <td>
                           <div className="order-actions">
@@ -2394,7 +2394,7 @@ function Admin({
                           </td>
                         </tr>
                       ))}
-                    </React.Fragment>
+                    </Fragment>
                   ))}
                   {menuItems.length === 0 && (
                     <tr>
