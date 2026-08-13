@@ -131,7 +131,8 @@ function Admin({
   const loadAdminUsersFromApi = () => {
     fetchAdminUsersApi()
       .then(res => {
-        if (res && res.users) setAdminUsersList(res.users);
+        if (Array.isArray(res)) setAdminUsersList(res);
+        else if (res && res.users) setAdminUsersList(res.users);
       })
       .catch(err => console.error('Failed to load admin users:', err));
   };
