@@ -18,25 +18,20 @@ router.get('/', authenticateToken, requireRole('Super Admin'), async (req, res) 
 
 router.post('/', authenticateToken, requireRole('Super Admin'), async (req, res) => {
   try {
-    const { username, password, display_name, role } = req.body;
+    const { username, password, display_name, role, permissions } = req.body;
     
     const checkRes = await db.execute({
       sql: 'SELECT id FROM users WHERE username = ?',
       args: [username]
     });
     if (checkRes.rows.length > 0) {
-      return res.status(400).json({ error: 'Username already exists' });
+      return res.status(400).json({ error: 'User already exists' });
     }
 
     const salt = bcrypt.genSaltSync(10);
     const password_hash = bcrypt.hashSync(password, salt);
     
-    let permissions = {};
-    if (role === 'Super Admin') {
-      permissions = { all: true };
-    } else if (role === 'Admin') {
-      permissions = { cms: { all: true }, products: { all: true }, inquiries: { all: true } };
-    }
+    // We expect permissions to be an array from the frontend
 
     const info = await db.execute({
       sql: 'INSERT INTO users (username, password_hash, display_name, role, permissions) VALUES (?, ?, ?, ?, ?)',

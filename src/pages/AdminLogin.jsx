@@ -57,13 +57,13 @@ function AdminLogin({ setIsAdminLoggedIn, setCurrentPage, websiteContent }) {
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group-login">
-            <label htmlFor="login-username">Username</label>
+            <label htmlFor="login-username">Email Address</label>
             <div className="input-wrapper-login">
               <User size={18} className="input-icon" />
               <input 
                 type="text" 
                 id="login-username" 
-                placeholder="Enter username" 
+                placeholder="Enter email address" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required

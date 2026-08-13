@@ -2805,12 +2805,12 @@ function Admin({
                   <h4>Create New Administrator</h4>
                   <form onSubmit={handleAddAdmin} className="form-grid mt-4">
                     <div className="form-group-cms">
-                      <label>Username</label>
+                      <label>Email Address</label>
                       <input 
                         type="text" 
                         value={newAdmin.username} 
-                        onChange={e => setNewAdmin({...newAdmin, username: e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '')})} 
-                        placeholder="e.g. john_doe" 
+                        onChange={e => setNewAdmin({...newAdmin, username: e.target.value.toLowerCase().trim()})} 
+                        placeholder="e.g. admin@sangath.com" 
                         required 
                       />
                     </div>
@@ -2847,7 +2847,7 @@ function Admin({
               <table className="admin-table mt-4">
                 <thead>
                   <tr>
-                    <th>Username</th>
+                    <th>Email Address</th>
                     <th>Role</th>
                     <th>Permissions Granted</th>
                     <th>Actions</th>
