@@ -131,8 +131,23 @@ function Admin({
   const loadAdminUsersFromApi = () => {
     fetchAdminUsersApi()
       .then(res => {
-        if (Array.isArray(res)) setAdminUsersList(res);
-        else if (res && res.users) setAdminUsersList(res.users);
+        let users = [];
+        if (Array.isArray(res)) users = res;
+        else if (res && res.users) users = res.users;
+        
+        users = users.map(u => {
+          let parsedPerms = u.permissions;
+          if (typeof parsedPerms === 'string') {
+            try { parsedPerms = JSON.parse(parsedPerms); } catch (e) { parsedPerms = []; }
+          }
+          if (typeof parsedPerms === 'object' && !Array.isArray(parsedPerms) && parsedPerms !== null) {
+            // Convert legacy object format {cms: true} to array ['cms']
+            parsedPerms = Object.keys(parsedPerms);
+          }
+          return { ...u, permissions: Array.isArray(parsedPerms) ? parsedPerms : [] };
+        });
+        
+        setAdminUsersList(users);
       })
       .catch(err => console.error('Failed to load admin users:', err));
   };
