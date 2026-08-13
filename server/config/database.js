@@ -148,12 +148,11 @@ export async function initializeDatabase() {
   ];
 
   try {
-    for (const statement of statements) {
-      await db.execute(statement);
-    }
+    await db.batch(statements.map(sql => ({ sql, args: [] })), "write");
     console.log('[DB] Turso Database initialized successfully');
   } catch (err) {
     console.error('[DB ERROR] Failed to initialize Turso database', err);
+    throw err;
   }
 }
 

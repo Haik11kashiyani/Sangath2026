@@ -36,7 +36,10 @@ let dbError = null;
 const setupDb = async () => {
   try {
     await initializeDatabase();
-    await seedDatabase();
+    // Only run heavy seeding locally — on Vercel the DB is already seeded
+    if (!process.env.VERCEL) {
+      await seedDatabase();
+    }
     dbReady = true;
     console.log('[SERVER] Database setup complete');
   } catch (error) {
