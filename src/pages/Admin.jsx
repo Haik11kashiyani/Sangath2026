@@ -88,8 +88,11 @@ function Admin({
 
   const hasPermission = (tab) => {
     if (adminRole === 'Super Admin' || adminPermissions.includes('all')) return true;
+    if (adminRole === 'Viewer' || adminPermissions.includes('view')) return true;
     return adminPermissions.includes(tab);
   };
+
+  const isViewer = adminRole === 'Viewer' || adminPermissions.includes('view');
 
 
   // CMS Content Local Draft State
@@ -147,7 +150,8 @@ function Admin({
     if (newAdmin.role === 'Super Admin') permissions = ['all'];
     else if (newAdmin.role === 'Content Manager') permissions = ['cms', 'categories'];
     else if (newAdmin.role === 'Product Manager') permissions = ['products', 'categories'];
-    else if (newAdmin.role === 'Sales Rep') permissions = ['inquiries'];
+    else if (newAdmin.role === 'Sales/Support Rep') permissions = ['inquiries'];
+    else if (newAdmin.role === 'Viewer') permissions = ['view'];
 
     try {
       await createAdminUserApi(newAdmin.username, newAdmin.password, newAdmin.role, permissions);
@@ -958,6 +962,24 @@ function Admin({
             View Website
           </button>
         </header>
+
+        {isViewer && (
+          <div style={{ 
+            background: 'linear-gradient(135deg, #1e3a5f, #2d5986)', 
+            color: '#fff', 
+            padding: '0.75rem 1.25rem', 
+            borderRadius: '8px', 
+            marginBottom: '1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            fontSize: '0.9rem',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+          }}>
+            <Eye size={18} />
+            <span><strong>View-Only Mode</strong> — You are logged in as a Viewer. All data is visible but editing is disabled.</span>
+          </div>
+        )}
 
         {/* --- OVERVIEW TAB --- */}
         {activeTab === 'overview' && (
@@ -2810,6 +2832,7 @@ function Admin({
                         <option value="Content Manager">Content Manager (Access to CMS and Categories only)</option>
                         <option value="Product Manager">Product Manager (Access to Products and Categories only)</option>
                         <option value="Sales/Support Rep">Sales/Support Rep (Access to Inquiries only)</option>
+                        <option value="Viewer">Viewer (Read-only Access to All Sections)</option>
                       </select>
                     </div>
                     <div className="form-group-cms" style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>

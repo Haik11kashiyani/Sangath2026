@@ -26,8 +26,28 @@ import { fetchContentApi, fetchProductsApi, fetchInquiriesApi, fetchMenuApi } fr
 import { DEFAULT_WEBSITE_CONTENT } from './utils/storage'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home')
-  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [currentPage, setCurrentPage] = useState(() => {
+    return localStorage.getItem('sangath_current_page') || 'home'
+  })
+
+  // Persist current page to localStorage so it survives page refresh
+  useEffect(() => {
+    localStorage.setItem('sangath_current_page', currentPage)
+  }, [currentPage])
+
+  const [selectedProduct, setSelectedProduct] = useState(() => {
+    const savedProd = localStorage.getItem('sangath_selected_product')
+    return savedProd ? JSON.parse(savedProd) : null
+  })
+
+  // Persist selected product as well
+  useEffect(() => {
+    if (selectedProduct) {
+      localStorage.setItem('sangath_selected_product', JSON.stringify(selectedProduct))
+    } else {
+      localStorage.removeItem('sangath_selected_product')
+    }
+  }, [selectedProduct])
   
   // 1. CMS Web Content State
   const [websiteContent, setWebsiteContent] = useState(DEFAULT_WEBSITE_CONTENT)

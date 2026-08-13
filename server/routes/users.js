@@ -40,7 +40,7 @@ router.post('/', authenticateToken, requireRole('Super Admin'), async (req, res)
 
     const info = await db.execute({
       sql: 'INSERT INTO users (username, password_hash, display_name, role, permissions) VALUES (?, ?, ?, ?, ?)',
-      args: [username, password_hash, display_name, role, JSON.stringify(permissions)]
+      args: [username, password_hash, display_name || '', role, JSON.stringify(permissions)]
     });
     
     res.status(201).json({ id: info.lastInsertRowid.toString(), message: 'User created successfully' });
