@@ -1,0 +1,289 @@
+import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import './App.css'
+import Footer from './components/Footer'
+import Header from './components/Header'
+import About from './pages/About'
+import Contact from './pages/Contact'
+import ExportsImports from './pages/ExportsImports'
+import Home from './pages/Home'
+import ProductDetail from './pages/ProductDetail'
+import Products from './pages/Products'
+import Quality from './pages/Quality'
+
+// Dynamic CMS page imports
+import Blog from './pages/Blog'
+import Careers from './pages/Careers'
+import Gallery from './pages/Gallery'
+import Harvest from './pages/Harvest'
+
+// Admin panel imports
+import AdminLogin from './pages/AdminLogin'
+import Admin from './pages/Admin'
+
+// API helpers
+import { fetchContentApi, fetchProductsApi, fetchInquiriesApi, fetchMenuApi } from './utils/api'
+import { DEFAULT_WEBSITE_CONTENT } from './utils/storage'
+
+function App() {
+  const [currentPage, setCurrentPage] = useState('home')
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  
+  // 1. CMS Web Content State
+  const [websiteContent, setWebsiteContent] = useState(DEFAULT_WEBSITE_CONTENT)
+  
+  // 2. Product Categories State
+  const [categories, setCategories] = useState([])
+  
+  // 3. Customer Inquiries State
+  const [inquiries, setInquiries] = useState([])
+  
+  // 4. Admin Auth Session State
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
+
+  // 5. Menu Items State
+  const [menuItems, setMenuItems] = useState([])
+
+  // Fetch initial content and products from API
+  useEffect(() => {
+    fetchContentApi()
+      .then(data => {
+        if (data && Object.keys(data).length > 0) {
+          setWebsiteContent(data);
+        }
+      })
+      .catch(err => console.error('Failed to load website content from API:', err));
+
+    fetchProductsApi()
+      .then(data => {
+        if (data && data.categories) {
+          setCategories(data.categories);
+        }
+      })
+      .catch(err => console.error('Failed to load products from API:', err));
+
+    fetchMenuApi()
+      .then(data => {
+        if (data && Array.isArray(data)) {
+          setMenuItems(data);
+        }
+      })
+      .catch(err => console.error('Failed to load menu from API:', err));
+  }, []);
+
+  // Sync SEO Metadata from CMS state on change
+  useEffect(() => {
+    if (websiteContent && websiteContent.general) {
+      document.title = websiteContent.general.siteTitle || 'Sangath Global Exim';
+      
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', websiteContent.general.metaDescription || '');
+      }
+      
+      const metaKeywords = document.querySelector('meta[name="keywords"]');
+      if (metaKeywords) {
+        metaKeywords.setAttribute('content', websiteContent.general.metaKeywords || '');
+      }
+    }
+  }, [websiteContent])
+
+  // Admin Session Expiry Watchdog
+  useEffect(() => {
+    const sessionToken = sessionStorage.getItem('sangath_admin_session_token');
+    const sessionExpiry = sessionStorage.getItem('sangath_admin_session_expiry');
+    
+    if (sessionToken && sessionExpiry) {
+      if (Date.now() < parseInt(sessionExpiry, 10)) {
+        setIsAdminLoggedIn(true);
+      } else {
+        // Session expired, clear tokens
+        sessionStorage.removeItem('sangath_admin_session_token');
+        sessionStorage.removeItem('sangath_admin_session_expiry');
+        setIsAdminLoggedIn(false);
+        if (currentPage === 'admin') {
+          setCurrentPage('admin-login');
+        }
+      }
+    } else {
+      setIsAdminLoggedIn(false);
+    }
+  }, [currentPage])
+
+  // Fetch inquiries when admin is logged in
+  useEffect(() => {
+    if (isAdminLoggedIn) {
+      fetchInquiriesApi()
+        .then(res => {
+          if (res && res.inquiries) {
+            setInquiries(res.inquiries);
+          }
+        })
+        .catch(err => console.error('Failed to load inquiries:', err));
+    }
+  }, [isAdminLoggedIn]);
+
+  // Helper to refresh categories database from API
+  const refreshCategories = () => {
+    fetchProductsApi()
+      .then(data => {
+        if (data && data.categories) setCategories(data.categories);
+      })
+      .catch(err => console.error('Refresh categories failed:', err));
+  };
+
+  // Helper to refresh website content from API
+  const refreshWebsiteContent = () => {
+    fetchContentApi()
+      .then(data => {
+        if (data) setWebsiteContent(data);
+      })
+      .catch(err => console.error('Refresh content failed:', err));
+  };
+
+  // Helper to refresh inquiries list in React state
+  const handleRefreshInquiries = () => {
+    fetchInquiriesApi()
+      .then(res => {
+        if (res && res.inquiries) setInquiries(res.inquiries);
+      })
+      .catch(err => console.error('Refresh inquiries failed:', err));
+  };
+
+  // Helper to refresh menu from API
+  const refreshMenu = () => {
+    fetchMenuApi()
+      .then(data => {
+        if (data && Array.isArray(data)) setMenuItems(data);
+      })
+      .catch(err => console.error('Refresh menu failed:', err));
+  };
+
+  const handleViewProduct = (product) => {
+    setSelectedProduct(product)
+    setCurrentPage('product-detail')
+  }
+
+  const renderPage = () => {
+    // Admin routing
+    if (currentPage === 'admin-login') {
+      return (
+        <AdminLogin 
+          setIsAdminLoggedIn={setIsAdminLoggedIn} 
+          setCurrentPage={setCurrentPage} 
+          websiteContent={websiteContent}
+        />
+      )
+    }
+
+    if (currentPage === 'admin') {
+      if (!isAdminLoggedIn) {
+        return (
+          <AdminLogin 
+            setIsAdminLoggedIn={setIsAdminLoggedIn} 
+            setCurrentPage={setCurrentPage} 
+            websiteContent={websiteContent}
+          />
+        )
+      }
+      return (
+        <Admin 
+          categories={categories}
+          updateCategories={setCategories}
+          websiteContent={websiteContent}
+          updateWebsiteContent={setWebsiteContent}
+          inquiries={inquiries}
+          setInquiries={setInquiries}
+          menuItems={menuItems}
+          refreshMenu={refreshMenu}
+          setIsAdminLoggedIn={setIsAdminLoggedIn}
+          setCurrentPage={setCurrentPage}
+        />
+      )
+    }
+
+    if (currentPage === 'product-detail' && selectedProduct) {
+      return (
+        <ProductDetail 
+          product={selectedProduct} 
+          onBack={() => setCurrentPage('products')}
+          categories={categories}
+          onSelectProduct={setSelectedProduct}
+          websiteContent={websiteContent}
+          onRefreshInquiries={handleRefreshInquiries}
+        />
+      )
+    }
+
+    switch (currentPage) {
+      case 'home':
+        return <Home setCurrentPage={setCurrentPage} websiteContent={websiteContent} />
+      case 'products':
+        return (
+          <Products 
+            setCurrentPage={setCurrentPage} 
+            onViewDetails={handleViewProduct} 
+            categories={categories}
+            websiteContent={websiteContent}
+          />
+        )
+      case 'about':
+        return <About websiteContent={websiteContent} />
+      case 'exports-imports':
+        return <ExportsImports setCurrentPage={setCurrentPage} websiteContent={websiteContent} />
+      case 'quality':
+        return <Quality websiteContent={websiteContent} />
+      case 'contact':
+        return <Contact websiteContent={websiteContent} onRefreshInquiries={handleRefreshInquiries} />
+      case 'blog':
+        return <Blog websiteContent={websiteContent} />
+      case 'careers':
+        return <Careers websiteContent={websiteContent} />
+      case 'gallery':
+        return <Gallery websiteContent={websiteContent} />
+      case 'harvest':
+        return <Harvest websiteContent={websiteContent} />
+      default:
+        return <Home setCurrentPage={setCurrentPage} websiteContent={websiteContent} />
+    }
+  }
+
+  // Hide header and footer inside full admin view
+  const isMinimalLayout = currentPage === 'admin' || currentPage === 'admin-login';
+
+  return (
+    <div className="app">
+      {!isMinimalLayout && (
+        <Header 
+          currentPage={currentPage} 
+          setCurrentPage={setCurrentPage} 
+          websiteContent={websiteContent}
+          isAdminLoggedIn={isAdminLoggedIn}
+          menuItems={menuItems}
+        />
+      )}
+      <main className="main-content">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentPage === 'product-detail' ? `product-${selectedProduct?.id}` : currentPage}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.24, ease: "easeInOut" }}
+          >
+            {renderPage()}
+          </motion.div>
+        </AnimatePresence>
+      </main>
+      {!isMinimalLayout && (
+        <Footer 
+          setCurrentPage={setCurrentPage} 
+          websiteContent={websiteContent}
+          menuItems={menuItems}
+        />
+      )}
+    </div>
+  )
+}
+
+export default App

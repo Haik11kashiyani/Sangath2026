@@ -1,0 +1,243 @@
+import { Menu, X, User, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import logo from "../assets/logo.png";
+import { fetchProductsApi } from '../utils/api';
+import './Header.css';
+
+function Header({ currentPage, setCurrentPage, websiteContent, isAdminLoggedIn, menuItems = [] }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(null)
+  
+  // Search & Cart states
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [cartCount, setCartCount] = useState(0)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 18)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Sync Cart Count
+  const updateCartCount = () => {
+    try {
+      const cart = JSON.parse(localStorage.getItem('sangath_inquiry_cart') || '[]');
+      setCartCount(cart.length);
+    } catch (e) {
+      setCartCount(0);
+    }
+  }
+
+  useEffect(() => {
+    updateCartCount();
+    // Listen for custom event when items are added to cart
+    window.addEventListener('sangath_cart_updated', updateCartCount);
+    return () => window.removeEventListener('sangath_cart_updated', updateCartCount);
+  }, [])
+
+  // Live product search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    
+    fetchProductsApi()
+      .then(data => {
+        const allProducts = [];
+        (data.categories || []).forEach(cat => {
+          (cat.products || []).forEach(p => {
+            allProducts.push({ ...p, categoryName: cat.name });
+          });
+        });
+        
+        const filtered = allProducts.filter(p => 
+          p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          p.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setSearchResults(filtered.slice(0, 5));
+      })
+      .catch(err => console.error('Search fetch error:', err));
+  }, [searchQuery])
+
+  const handleSearchResultClick = (product) => {
+    setSearchOpen(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    
+    // Direct detail view selection
+    try {
+      // Find the actual product in state and trigger details
+      const customEvent = new CustomEvent('sangath_view_product', { detail: product });
+      window.dispatchEvent(customEvent);
+    } catch (e) {
+      console.error(e);
+    }
+    setCurrentPage('products');
+  }
+
+  // Get brand name and logo from CMS settings
+  const brandName = websiteContent?.general?.logoText || "Sangath Global Exim";
+  const customLogo = websiteContent?.general?.logoImage;
+
+  const handleProfileClick = () => {
+    if (isAdminLoggedIn) {
+      setCurrentPage('admin');
+    } else {
+      setCurrentPage('admin-login');
+    }
+  }
+
+  const handleNavClick = (item) => {
+    if (item.external_url) {
+      window.open(item.external_url, '_blank');
+      return;
+    }
+    if (item.page) {
+      setCurrentPage(item.page);
+      setMobileMenuOpen(false);
+      setSearchOpen(false);
+      setDropdownOpen(null);
+    }
+  }
+
+  return (
+    <header className={`header${scrolled ? ' header--scrolled' : ''}`}>
+      <div className="header-main">
+        <div className="container">
+          <div className="header-content">
+            
+            {/* Brand Logo */}
+            <div className="header-logo" onClick={() => setCurrentPage('home')}>
+              <div className="logo-wrapper">
+                <img
+                  src={customLogo || logo}
+                  alt={brandName}
+                  className="logo-image"
+                />
+                <span className="logo-text">{brandName}</span>
+              </div>
+            </div>
+
+            {/* Main Menu Nav */}
+            <nav className={`header-nav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
+              <ul className="nav-menu">
+                {menuItems.filter(item => item.is_visible).map((item, index) => (
+                  <li 
+                    key={item.id} 
+                    style={{ '--item-index': index }}
+                    className={item.children?.length > 0 ? 'has-dropdown' : ''}
+                    onMouseEnter={() => setDropdownOpen(item.id)}
+                    onMouseLeave={() => setDropdownOpen(null)}
+                  >
+                    <button
+                      className={currentPage === item.page ? 'active' : ''}
+                      onClick={() => {
+                        // On mobile, clicking a parent toggles dropdown, on desktop it navigates
+                        if (mobileMenuOpen && item.children?.length > 0) {
+                          setDropdownOpen(dropdownOpen === item.id ? null : item.id);
+                        } else {
+                          handleNavClick(item);
+                        }
+                      }}
+                    >
+                      <span className="nav-label">{item.label}</span>
+                      {item.children?.length > 0 && <span className="dropdown-arrow">▼</span>}
+                    </button>
+                    
+                    {item.children?.length > 0 && dropdownOpen === item.id && (
+                      <ul className="dropdown-menu">
+                        {item.children.filter(child => child.is_visible).map(child => (
+                          <li key={child.id}>
+                            <button onClick={() => handleNavClick(child)}>
+                              {child.label}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {/* Quick Actions Panel */}
+            <div className="header-actions">
+              {/* Live Search Trigger */}
+              <div className="action-search-container">
+                <button 
+                  className={`action-btn search-trigger ${searchOpen ? 'active' : ''}`}
+                  onClick={() => setSearchOpen(!searchOpen)}
+                  aria-label="Search products"
+                >
+                  <Search size={20} />
+                </button>
+                {searchOpen && (
+                  <div className="search-dropdown-overlay">
+                    <div className="search-input-wrapper">
+                      <input 
+                        type="text" 
+                        placeholder="Search products..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        autoFocus
+                      />
+                      <button className="search-close" onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchResults([]); }}>
+                        <X size={16} />
+                      </button>
+                    </div>
+                    {searchResults.length > 0 && (
+                      <ul className="search-results-list">
+                        {searchResults.map(p => (
+                          <li key={p.id} onClick={() => handleSearchResultClick(p)}>
+                            <div className="search-result-item">
+                              <img src={p.image} alt={p.name} className="result-thumb" />
+                              <div>
+                                <h4 className="result-name">{p.name}</h4>
+                                <span className="result-category">{p.categoryName}</span>
+                              </div>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {searchQuery.trim() && searchResults.length === 0 && (
+                      <div className="no-results-toast">No products found.</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Admin profile switcher */}
+              <button 
+                className={`action-btn profile-trigger ${isAdminLoggedIn ? 'logged-in' : ''}`}
+                onClick={handleProfileClick}
+                aria-label="Admin settings"
+                title={isAdminLoggedIn ? "Go to Admin Dashboard" : "Admin Login"}
+              >
+                <User size={20} />
+                {isAdminLoggedIn && <span className="admin-status-dot"></span>}
+              </button>
+
+              {/* Mobile toggle */}
+              <button 
+                className="mobile-menu-toggle"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </header>
+  )
+}
+
+export default Header
