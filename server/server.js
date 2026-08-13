@@ -60,13 +60,6 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
-// Serve uploaded static files
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-app.use('/uploads', express.static(uploadsDir));
-
 // Mount API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
