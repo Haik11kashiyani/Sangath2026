@@ -7,7 +7,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
-// Load environment variables
+// Load environment variables from local .env (ignored on Vercel since env vars are injected)
 dotenv.config({ path: path.join(process.cwd(), 'server', '.env') });
 
 import { initializeDatabase } from './config/database.js';
@@ -29,24 +29,26 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Initialize DB and auto-seed if empty
-// On Vercel, we might want to do this lazily or in a separate script, 
-// but doing it synchronously on startup is fine for serverless if it's fast enough.
-// Since it's async now, we do it in a self-invoking function if running locally.
+// Track DB readiness
+let dbReady = false;
+let dbError = null;
+
 const setupDb = async () => {
   try {
     await initializeDatabase();
     await seedDatabase();
+    dbReady = true;
+    console.log('[SERVER] Database setup complete');
   } catch (error) {
+    dbError = error;
     console.error('Database initialization error:', error);
   }
 };
-// We trigger it here. It returns a promise.
-setupDb();
+const dbPromise = setupDb();
 
 // Middleware
 app.use(helmet({
-  contentSecurityPolicy: false, // allow images/scripts from local dev
+  contentSecurityPolicy: false,
 }));
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -60,6 +62,22 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
+// Wait for DB to be ready before handling any API request (except health/debug)
+app.use('/api/', async (req, res, next) => {
+  if (req.path === '/health' || req.path === '/debug') return next();
+  if (!dbReady && !dbError) {
+    // Wait up to 10s for DB to initialize
+    await Promise.race([dbPromise, new Promise(r => setTimeout(r, 10000))]);
+  }
+  if (dbError) {
+    return res.status(500).json({ 
+      error: 'Database connection failed', 
+      details: dbError.message 
+    });
+  }
+  next();
+});
+
 // Mount API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
@@ -72,7 +90,23 @@ app.use('/api/menu', menuRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', time: new Date().toISOString() });
+  res.json({ status: 'ok', dbReady, time: new Date().toISOString() });
+});
+
+// Debug endpoint - shows env var status (masks values for security)
+app.get('/api/debug', (req, res) => {
+  res.json({
+    dbReady,
+    dbError: dbError ? dbError.message : null,
+    env: {
+      TURSO_DATABASE_URL: process.env.TURSO_DATABASE_URL ? process.env.TURSO_DATABASE_URL.substring(0, 30) + '...' : 'NOT SET',
+      TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN ? 'SET (' + process.env.TURSO_AUTH_TOKEN.length + ' chars)' : 'NOT SET',
+      CLOUDINARY_URL: process.env.CLOUDINARY_URL ? 'SET' : 'NOT SET',
+      JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
+      NODE_ENV: process.env.NODE_ENV || 'NOT SET',
+      VERCEL: process.env.VERCEL || 'NOT SET',
+    }
+  });
 });
 
 // Serve frontend dist build if present (Production)

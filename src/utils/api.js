@@ -19,7 +19,8 @@ function getAuthHeader() {
 async function handleResponse(res) {
   const data = await res.json();
   if (!res.ok) {
-    const errorMsg = data.error || data.message || `Request failed with status ${res.status}`;
+    console.error('API Error Response Data:', data);
+    const errorMsg = data.details || data.error || data.message || `Request failed with status ${res.status}`;
     throw new Error(errorMsg);
   }
   return data;
