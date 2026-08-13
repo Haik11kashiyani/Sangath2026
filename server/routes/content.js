@@ -36,7 +36,7 @@ router.get('/', async (req, res) => {
     res.json(content);
   } catch (error) {
     console.error('Fetch content error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message, stack: error.stack });
   }
 });
 
