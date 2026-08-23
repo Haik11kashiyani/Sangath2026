@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Briefcase, Check } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { sanitizeInput } from '../utils/security'
 import { submitInquiryApi } from '../utils/api'
 import './ProductDetail.css'
 
-function ProductDetail({ product, onBack, categories, onSelectProduct, websiteContent, onRefreshInquiries }) {
+function ProductDetail({ product, onBack, categories, onSelectProduct, onRefreshInquiries }) {
   const [formData, setFormData] = useState({
     name: '',
     company: '',
@@ -13,7 +13,6 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, websiteCo
     message: ''
   })
   
-  const [isInCart, setIsInCart] = useState(false)
   const [activeMedia, setActiveMedia] = useState(null)
 
   useEffect(() => {
@@ -21,45 +20,14 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, websiteCo
     
     if (product) {
       // Set initial active media to the main product image
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveMedia({ type: 'image', url: product.image });
-    }
-    
-    // Check if product is in the inquiry cart
-    try {
-      if (product) {
-        const cart = JSON.parse(localStorage.getItem('sangath_inquiry_cart') || '[]');
-        setIsInCart(cart.includes(product.id));
-      }
-    } catch (e) {
-      setIsInCart(false);
     }
   }, [product])
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const handleToggleCart = () => {
-    if (!product) return;
-    try {
-      const cart = JSON.parse(localStorage.getItem('sangath_inquiry_cart') || '[]');
-      let updatedCart = [];
-      
-      if (cart.includes(product.id)) {
-        updatedCart = cart.filter(id => id !== product.id);
-        setIsInCart(false);
-      } else {
-        updatedCart = [...cart, product.id];
-        setIsInCart(true);
-      }
-      
-      localStorage.setItem('sangath_inquiry_cart', JSON.stringify(updatedCart));
-      // Dispatch event to sync header count
-      window.dispatchEvent(new Event('sangath_cart_updated'));
-    } catch (e) {
-      console.error('Error modifying inquiry cart', e);
-    }
   }
 
   const handleSubmit = async (e) => {
@@ -133,17 +101,7 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, websiteCo
             Back to Products
           </button>
           
-          <div className="product-title-action-header">
-            <h1 className="product-detail-title">{product.name}</h1>
-            <button 
-              className={`btn-add-inquiry-list ${isInCart ? 'added' : ''}`}
-              onClick={handleToggleCart}
-              title={isInCart ? "Remove from Inquiry List" : "Add to Inquiry List for Bulk Quote"}
-            >
-              {isInCart ? <Check size={16} /> : <Briefcase size={16} />}
-              {isInCart ? "Added to Inquiry List" : "Add to Inquiry List"}
-            </button>
-          </div>
+          <h1 className="product-detail-title">{product.name}</h1>
           
           <div className="product-top-section">
             <div className="product-detail-description">
@@ -190,20 +148,32 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, websiteCo
 
           <div className="product-details-section">
             <h2>Product Details</h2>
-            {product.details && product.details.map((detail, idx) => (
-              <div key={idx} className="detail-block">
-                {detail.type === 'list' && (
-                  <>
-                    {detail.title && <h4>{detail.title}</h4>}
-                    <ul className="detail-list">
-                      {detail.items.map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-              </div>
-            ))}
+            {product.details && product.details.length > 0 ? (
+              product.details.map((detail, idx) => (
+                <div key={idx} className="detail-block">
+                  {detail.type === 'text' && (
+                    <>
+                      {detail.title && <h4>{detail.title}</h4>}
+                      <div className="detail-text-block">
+                        <p>{detail.content}</p>
+                      </div>
+                    </>
+                  )}
+                  {detail.type === 'list' && (
+                    <>
+                      {detail.title && <h4>{detail.title}</h4>}
+                      <ul className="detail-list">
+                        {detail.items && detail.items.map((item, i) => (
+                          <li key={i}>{item}</li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="no-details-text">No additional details available for this product.</p>
+            )}
           </div>
 
           {product.specifications && product.specifications.length > 0 && (
@@ -319,3 +289,4 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, websiteCo
 }
 
 export default ProductDetail
+

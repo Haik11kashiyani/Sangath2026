@@ -111,7 +111,8 @@ function Products({ setCurrentPage, onViewDetails, categories, websiteContent })
                       {product.description}
                     </p>
 
-                    {product.price && (
+                    {/* Price visibility controlled by admin toggle */}
+                    {websiteContent?.products?.showPrices !== false && product.price && (
                       <p className="product-price">₹ {product.price}</p>
                     )}
 

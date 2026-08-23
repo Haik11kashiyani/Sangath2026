@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion'
 import './App.css'
 import Footer from './components/Footer'
@@ -113,6 +114,7 @@ function App() {
     const sessionToken = sessionStorage.getItem('sangath_admin_session_token');
     const sessionExpiry = sessionStorage.getItem('sangath_admin_session_expiry');
     
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (sessionToken && sessionExpiry) {
       if (Date.now() < parseInt(sessionExpiry, 10)) {
         setIsAdminLoggedIn(true);
@@ -128,6 +130,7 @@ function App() {
     } else {
       setIsAdminLoggedIn(false);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [currentPage])
 
   // Fetch inquiries when admin is logged in
@@ -152,14 +155,7 @@ function App() {
       .catch(err => console.error('Refresh categories failed:', err));
   };
 
-  // Helper to refresh website content from API
-  const refreshWebsiteContent = () => {
-    fetchContentApi()
-      .then(data => {
-        if (data) setWebsiteContent(data);
-      })
-      .catch(err => console.error('Refresh content failed:', err));
-  };
+
 
   // Helper to refresh inquiries list in React state
   const handleRefreshInquiries = () => {
@@ -212,7 +208,6 @@ function App() {
           updateCategories={refreshCategories}
           websiteContent={websiteContent}
           updateWebsiteContent={setWebsiteContent}
-          refreshWebsiteContent={refreshWebsiteContent}
           inquiries={inquiries}
           setInquiries={setInquiries}
           menuItems={menuItems}
@@ -230,7 +225,6 @@ function App() {
           onBack={() => setCurrentPage('products')}
           categories={categories}
           onSelectProduct={setSelectedProduct}
-          websiteContent={websiteContent}
           onRefreshInquiries={handleRefreshInquiries}
         />
       )

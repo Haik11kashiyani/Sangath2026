@@ -25,8 +25,9 @@ import {
   MoveUp,
   MoveDown
 } from 'lucide-react';
-import { sanitizeInput, validateImageUrl, validateImageFile } from '../utils/security';
+import { sanitizeInput, validateImageFile } from '../utils/security';
 import { getCountryFlagUrl } from '../utils/flags';
+import { resetToDefaults } from '../utils/storage';
 import {
   saveContentBulkApi,
   createCategoryApi,
@@ -54,7 +55,7 @@ function Admin({
   categories, 
   updateCategories, 
   websiteContent, 
-  updateWebsiteContent, 
+  updateWebsiteContent,
   inquiries, 
   setInquiries, 
   menuItems = [],
@@ -77,13 +78,15 @@ function Admin({
     const perms = sessionStorage.getItem('sangath_admin_permissions');
     const uname = sessionStorage.getItem('sangath_admin_username');
     
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (role) setAdminRole(role);
     if (uname) setAdminUsername(uname);
     if (perms) {
       try {
         setAdminPermissions(JSON.parse(perms));
-      } catch(e) {}
+      } catch { /* ignore parse error, use defaults */ }
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   const hasPermission = (tab) => {
@@ -101,6 +104,7 @@ function Admin({
   // Sync draft state on mount or reset
   useEffect(() => {
     if (websiteContent) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCmsDraft(JSON.parse(JSON.stringify(websiteContent)));
     }
   }, [websiteContent]);
@@ -138,7 +142,7 @@ function Admin({
         users = users.map(u => {
           let parsedPerms = u.permissions;
           if (typeof parsedPerms === 'string') {
-            try { parsedPerms = JSON.parse(parsedPerms); } catch (e) { parsedPerms = []; }
+            try { parsedPerms = JSON.parse(parsedPerms); } catch { parsedPerms = []; }
           }
           if (typeof parsedPerms === 'object' && !Array.isArray(parsedPerms) && parsedPerms !== null) {
             // Convert legacy object format {cms: true} to array ['cms']
@@ -213,7 +217,7 @@ function Admin({
       }
       setIsMenuModalOpen(false);
       if (refreshMenu) refreshMenu();
-    } catch (err) {
+    } catch {
       triggerToast('Error saving menu item', 'error');
     }
   };
@@ -224,7 +228,7 @@ function Admin({
       await deleteMenuItemApi(id);
       triggerToast('Menu item deleted');
       if (refreshMenu) refreshMenu();
-    } catch (err) {
+    } catch {
       triggerToast('Error deleting menu item', 'error');
     }
   };
@@ -238,7 +242,7 @@ function Admin({
       try {
         await reorderMenuApi(payload);
         if (refreshMenu) refreshMenu();
-      } catch (e) {
+      } catch {
         triggerToast('Failed to reorder', 'error');
       }
     } else if (direction === 'down' && index < array.length - 1) {
@@ -249,7 +253,7 @@ function Admin({
       try {
         await reorderMenuApi(payload);
         if (refreshMenu) refreshMenu();
-      } catch (e) {
+      } catch {
         triggerToast('Failed to reorder', 'error');
       }
     }
@@ -519,6 +523,55 @@ function Admin({
   }
 
   const handleContactIconUpload = (field, e) => handleSiteImageUpload('general', field, field, e);
+
+  const handleBenefitIconUpload = async (i, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      alert(validation.error);
+      return;
+    }
+
+    try {
+      const res = await uploadSiteImageApi('home', 'benefits', `icon_${i}`, file);
+      
+      const updatedBenefits = [...(cmsDraft.home.benefits || [])];
+      if (updatedBenefits[i]) {
+        updatedBenefits[i] = { ...updatedBenefits[i], icon: res.file_path };
+        handleDraftChange('home.benefits', updatedBenefits);
+        triggerToast('Icon uploaded successfully');
+      }
+    } catch (err) {
+      triggerToast(err.message || 'Image upload failed', 'error');
+    }
+  }
+
+  const handleCountryFlagUpload = async (i, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      alert(validation.error);
+      return;
+    }
+
+    try {
+      const res = await uploadSiteImageApi('exportsImports', 'exports', `flag_${i}`, file);
+      
+      const updatedCountries = [...(cmsDraft.exportsImports.exports.countries || [])];
+      if (updatedCountries[i]) {
+        const countryName = typeof updatedCountries[i] === 'object' ? updatedCountries[i].name : updatedCountries[i];
+        updatedCountries[i] = { name: countryName, flag: res.file_path };
+        handleDraftChange('exportsImports.exports.countries', updatedCountries);
+        triggerToast('Flag uploaded successfully');
+      }
+    } catch (err) {
+      triggerToast(err.message || 'Image upload failed', 'error');
+    }
+  }
 
   const renderHeaderEditorFields = (pageKey, defaultTitle, defaultSubtitle, defaultBanner) => {
     const pageData = cmsDraft[pageKey] || {};
@@ -801,6 +854,7 @@ function Admin({
 
   useEffect(() => {
     if (adminUsername) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditUsername(adminUsername);
     }
   }, [adminUsername]);
@@ -1948,6 +2002,29 @@ function Admin({
               <div className="panel-card mt-4">
                 <h3>Products Page Content</h3>
                 {renderHeaderEditorFields('products', 'Our Products', 'Premium Agricultural Commodities for Global Markets', '/images/Cumin_Seeds.jpg')}
+
+                <hr className="divider-cms" />
+
+                <h4>Price Display Settings</h4>
+                <div className="form-group-cms full-width">
+                  <label className="checkbox-label" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', fontSize: '1rem' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={cmsDraft.products?.showPrices !== false}
+                      onChange={(e) => {
+                        handleDraftChange('products.showPrices', e.target.checked);
+                      }}
+                      style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                    />
+                    <span style={{ fontWeight: 700 }}>Show Product Prices on Website</span>
+                  </label>
+                  <p className="hint-text" style={{ fontStyle: 'italic', color: 'var(--text-muted)', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                    When disabled, product prices will be hidden from the public Products listing page. Prices can still be set per product in the Products CRUD tab.
+                  </p>
+                </div>
+
+                <hr className="divider-cms" />
+
                 <p className="hint-text" style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>
                   Note: Individual products can be added, updated, or removed using the <strong>Products CRUD</strong> tab on the left sidebar.
                 </p>

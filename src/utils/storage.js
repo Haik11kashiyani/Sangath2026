@@ -355,7 +355,8 @@ export const DEFAULT_WEBSITE_CONTENT = {
       title: "Our Products",
       subtitle: "Premium Agricultural Commodities for Global Markets",
       bannerImage: "/images/Cumin_Seeds.jpg"
-    }
+    },
+    showPrices: true
   },
   contact: {
     header: {
