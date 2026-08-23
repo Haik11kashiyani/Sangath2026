@@ -1,5 +1,6 @@
-import { UserRound } from 'lucide-react'
+import { Check, Globe2 } from 'lucide-react'
 import { useEffect } from 'react'
+import { getCountryFlagUrl } from '../utils/flags'
 import './About.css'
 
 function About({ websiteContent }) {
@@ -14,7 +15,6 @@ function About({ websiteContent }) {
   const company = aboutData.company || { title: "About Sangath Global Exim", paragraphs: [] };
   const vision = aboutData.vision || { title: "Our Vision", items: [] };
   const mission = aboutData.mission || { title: "Our Mission", items: [] };
-  const managementTeam = aboutData.managementTeam || [];
   
   const certifications = aboutData.certifications || { 
     title: "Certifications & Compliance", 
@@ -27,6 +27,14 @@ function About({ websiteContent }) {
     intro: "We operate under strict governance principles:", 
     items: [] 
   };
+
+  // Exports data from CMS
+  const tradeData = websiteContent?.exportsImports || {};
+  const exportData = tradeData.exports || { title: "Our Exports", description: "", countries: [], products: [] };
+  const exportCountries = (exportData.countries || []).filter(c => {
+    const name = typeof c === 'object' ? c.name : c;
+    return name.toLowerCase() !== 'benin';
+  });
 
   const bannerImage = aboutData.bannerImage || '/images/about_us_banner.png';
   const header = aboutData.header || {
@@ -86,24 +94,50 @@ function About({ websiteContent }) {
           </div>
         </section>
 
-        {/* Management Team */}
-        <section className="team-section">
-          <h2>Management Team</h2>
-          <div className="team-grid">
-            {managementTeam.map((member, index) => (
-              <div key={index} className="team-card">
-                <div className="team-photo-placeholder">
-                  <UserRound className="team-icon" size={42} aria-hidden="true" />
-                </div>
-                <h3>{member.name}</h3>
-                <p>{member.role}</p>
-                {member.phone && (
-                  <p className="team-contact">
-                    <a href={`tel:${member.phone.replace(/\s+/g, '')}`}>{member.phone}</a>
-                  </p>
-                )}
+        {/* Our Exports Section (replaces Management Team) */}
+        <section className="about-exports-section">
+          <div className="about-exports-header">
+            <h2>{exportData.title || "Our Exports"}</h2>
+            <div className="about-exports-divider"></div>
+            {exportData.description && <p className="about-exports-description">{exportData.description}</p>}
+          </div>
+
+          <div className="about-exports-grid">
+            <div className="about-exports-card">
+              <h3>Export Destinations</h3>
+              <div className="about-exports-countries">
+                {exportCountries.map((country, index) => {
+                  const name = typeof country === 'object' ? country.name : country;
+                  const flagUrl = (typeof country === 'object' && country.flag) ? country.flag : getCountryFlagUrl(name);
+                  return (
+                    <div key={index} className="about-exports-country">
+                      {flagUrl ? (
+                        <img 
+                          src={flagUrl} 
+                          alt={`${name} flag`} 
+                          className="about-exports-flag" 
+                        />
+                      ) : (
+                        <Globe2 className="about-exports-globe-icon" size={26} aria-hidden="true" />
+                      )}
+                      <span className="about-exports-country-name">{name}</span>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+            </div>
+
+            <div className="about-exports-card">
+              <h3>Export Products</h3>
+              <ul className="about-exports-products-list">
+                {exportData.products && exportData.products.map((product, index) => (
+                  <li key={index}>
+                    <Check className="about-exports-check-icon" size={18} aria-hidden="true" />
+                    <span>{product}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 

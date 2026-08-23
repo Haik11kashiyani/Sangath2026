@@ -5,7 +5,7 @@ import Footer from './components/Footer'
 import Header from './components/Header'
 import About from './pages/About'
 import Contact from './pages/Contact'
-import ExportsImports from './pages/ExportsImports'
+
 import Home from './pages/Home'
 import ProductDetail from './pages/ProductDetail'
 import Products from './pages/Products'
@@ -209,9 +209,10 @@ function App() {
       return (
         <Admin 
           categories={categories}
-          updateCategories={setCategories}
+          updateCategories={refreshCategories}
           websiteContent={websiteContent}
           updateWebsiteContent={setWebsiteContent}
+          refreshWebsiteContent={refreshWebsiteContent}
           inquiries={inquiries}
           setInquiries={setInquiries}
           menuItems={menuItems}
@@ -249,8 +250,7 @@ function App() {
         )
       case 'about':
         return <About websiteContent={websiteContent} />
-      case 'exports-imports':
-        return <ExportsImports setCurrentPage={setCurrentPage} websiteContent={websiteContent} />
+
       case 'quality':
         return <Quality websiteContent={websiteContent} />
       case 'contact':
