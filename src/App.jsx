@@ -225,7 +225,6 @@ function App() {
           onBack={() => setCurrentPage('products')}
           categories={categories}
           onSelectProduct={setSelectedProduct}
-          onRefreshInquiries={handleRefreshInquiries}
         />
       )
     }

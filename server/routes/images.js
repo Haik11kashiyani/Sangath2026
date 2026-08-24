@@ -2,9 +2,7 @@ import { Router } from 'express';
 import db from '../config/database.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { requirePermission, requireRole } from '../middleware/rbac.js';
-import { upload, optimizeImage } from '../middleware/upload.js';
-import fs from 'fs';
-import path from 'path';
+import { upload } from '../middleware/upload.js';
 
 const router = Router();
 

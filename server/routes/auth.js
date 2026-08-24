@@ -39,7 +39,7 @@ router.post('/login', async (req, res) => {
     
     const token = generateToken(user);
     
-    const { password_hash, ...userInfo } = user;
+    const { password_hash: _password_hash, ...userInfo } = user;
     if (typeof userInfo.permissions === 'string') {
       try { userInfo.permissions = JSON.parse(userInfo.permissions); } catch(e) {}
     }
@@ -59,7 +59,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     const user = resultSet.rows[0];
     
     if (!user) return res.status(404).json({ error: 'User not found' });
-    const { password_hash, ...userInfo } = user;
+    const { password_hash: _password_hash, ...userInfo } = user;
     if (typeof userInfo.permissions === 'string') {
       try { userInfo.permissions = JSON.parse(userInfo.permissions); } catch(e) {}
     }

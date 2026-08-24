@@ -433,6 +433,7 @@ function Admin({
         video: prod.video || '',
         featured: prod.featured || false,
         price: prod.price || '',
+        imageFile: null,
         specifications: prod.specifications ? [...prod.specifications] : [],
         details: prod.details ? JSON.parse(JSON.stringify(prod.details)) : []
       });
@@ -448,6 +449,7 @@ function Admin({
         video: '',
         featured: false,
         price: '',
+        imageFile: null,
         specifications: [],
         details: []
       });
@@ -651,13 +653,17 @@ function Admin({
       formData.append('category_id', productForm.categoryId);
       formData.append('video', productForm.video || '');
       formData.append('featured', productForm.featured ? '1' : '0');
-      if (productForm.price) formData.append('price', String(productForm.price));
+      formData.append('price', productForm.price !== '' && productForm.price !== null && productForm.price !== undefined ? String(productForm.price) : '');
+      formData.append('images', JSON.stringify(productForm.images || []));
       if (productForm.specifications) formData.append('specifications', JSON.stringify(productForm.specifications));
       if (productForm.details) formData.append('details', JSON.stringify(productForm.details));
 
-      // Handle image file upload or image URL string
+      // Handle image: if gallery images exist, first one is the main/cover image
+      const galleryImages = productForm.images || [];
       if (productForm.imageFile) {
         formData.append('image', productForm.imageFile);
+      } else if (galleryImages.length > 0) {
+        formData.append('image', galleryImages[0]);
       } else if (productForm.image) {
         formData.append('image', productForm.image);
       }
@@ -700,17 +706,9 @@ function Admin({
     if (!undoCache) return;
 
     if (undoCache.type === 'product') {
-      const updated = categories.map(cat => {
-        if (cat.id === undoCache.categoryId) {
-          return {
-            ...cat,
-            products: [...cat.products, undoCache.product]
-          };
-        }
-        return cat;
-      });
-      updateCategories(updated);
-      triggerToast('Product restored successfully');
+      // Refresh categories from API to reflect any restored state
+      updateCategories();
+      triggerToast('Refreshed product list');
     }
 
     setUndoCache(null);
@@ -893,7 +891,7 @@ function Admin({
 
   const filteredProducts = allFlattenedProducts.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          p.description.toLowerCase().includes(searchQuery.toLowerCase());
+                          (p.description || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || p.categoryId === categoryFilter;
     return matchesSearch && matchesCategory;
   });
@@ -1087,7 +1085,7 @@ function Admin({
                           <strong>{inq.name}</strong>
                           <span>{new Date(inq.timestamp).toLocaleDateString()}</span>
                         </div>
-                        <p>{inq.message.length > 80 ? inq.message.substring(0, 80) + '...' : inq.message}</p>
+                        <p>{(inq.message || '').length > 80 ? (inq.message || '').substring(0, 80) + '...' : (inq.message || 'No message')}</p>
                         {inq.product && <span className="interest-tag">Interested in: {inq.product}</span>}
                       </div>
                     ))}
@@ -3119,14 +3117,123 @@ function Admin({
                     </label>
                   </div>
 
+                  {/* ── MEDIA GALLERY MANAGER ── */}
                   <div className="form-group-cms full-width">
-                    <label>Product Image Link / File Upload</label>
+                    <label style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--primary-navy)', marginBottom: '0.75rem', display: 'block' }}>
+                      Product Images Gallery
+                    </label>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                      Add multiple images for the product slideshow. The first image will be used as the main/cover image.
+                    </p>
+
+                    {/* Gallery Grid */}
+                    <div className="admin-gallery-grid">
+                      {(productForm.images || []).map((imgUrl, idx) => (
+                        <div key={idx} className="admin-gallery-card">
+                          <div className="admin-gallery-thumb">
+                            <img 
+                              src={imgUrl} 
+                              alt={`Gallery ${idx + 1}`}
+                              onError={(e) => { e.target.src = '/images/Cumin_Seeds.jpg'; }}
+                            />
+                            {idx === 0 && <span className="admin-gallery-badge">COVER</span>}
+                          </div>
+                          <div className="admin-gallery-card-actions">
+                            <input 
+                              type="text"
+                              value={imgUrl}
+                              onChange={(e) => {
+                                const updated = [...(productForm.images || [])];
+                                updated[idx] = e.target.value;
+                                setProductForm(prev => ({ ...prev, images: updated }));
+                              }}
+                              placeholder="Image URL..."
+                              className="admin-gallery-url-input"
+                            />
+                            <button 
+                              type="button" 
+                              className="btn-builder-remove"
+                              title="Remove this image"
+                              onClick={() => {
+                                const updated = [...(productForm.images || [])];
+                                updated.splice(idx, 1);
+                                setProductForm(prev => ({ ...prev, images: updated, image: updated[0] || prev.image }));
+                              }}
+                            >
+                              <X size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Add New Image Card */}
+                      <div className="admin-gallery-add-card">
+                        <div className="admin-gallery-add-content">
+                          <Plus size={24} style={{ color: 'var(--spice-gold)', marginBottom: '0.5rem' }} />
+                          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)' }}>Add Image</span>
+                        </div>
+                        <div className="admin-gallery-add-actions">
+                          <button 
+                            type="button"
+                            className="btn-gallery-add-url"
+                            onClick={() => {
+                              const url = prompt('Enter image URL:');
+                              if (url && url.trim()) {
+                                const updated = [...(productForm.images || []), url.trim()];
+                                setProductForm(prev => ({ ...prev, images: updated, image: updated[0] || prev.image }));
+                              }
+                            }}
+                          >
+                            Paste URL
+                          </button>
+                          <div className="btn-file-wrapper" style={{ fontSize: '0.78rem', padding: '0.45rem 0.75rem' }}>
+                            <span>Upload File</span>
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={async (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                const validation = validateImageFile(file);
+                                if (!validation.valid) {
+                                  alert(validation.error);
+                                  return;
+                                }
+                                try {
+                                  const res = await uploadSiteImageApi('products', 'gallery', `img_${Date.now()}`, file);
+                                  if (res.file_path) {
+                                    const updated = [...(productForm.images || []), res.file_path];
+                                    setProductForm(prev => ({ ...prev, images: updated, image: updated[0] || prev.image }));
+                                    triggerToast('Image uploaded to gallery');
+                                  }
+                                } catch (err) {
+                                  triggerToast(err.message || 'Upload failed', 'error');
+                                }
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {(productForm.images || []).length === 0 && (
+                      <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '0.5rem' }}>
+                        No gallery images added. You can also set a single main image below.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Fallback Single Main Image (if gallery is empty) */}
+                  <div className="form-group-cms full-width">
+                    <label>Main Product Image {(productForm.images || []).length > 0 ? '(Auto-set from first gallery image)' : '(Link / File Upload)'}</label>
                     <div className="image-input-flex">
                       <input 
                         type="text" 
                         placeholder="/images/cumin.jpg or https://url-link.jpg"
                         value={productForm.image}
                         onChange={(e) => setProductForm(prev => ({ ...prev, image: e.target.value }))}
+                        disabled={(productForm.images || []).length > 0}
+                        style={{ opacity: (productForm.images || []).length > 0 ? 0.5 : 1 }}
                       />
                       <span className="file-or-span">OR</span>
                       <div className="btn-file-wrapper">
@@ -3146,27 +3253,39 @@ function Admin({
                     )}
                   </div>
 
+                  {/* Video Section */}
                   <div className="form-group-cms full-width">
-                    <label>Additional Product Gallery Images (Comma-separated URLs/Paths)</label>
-                    <textarea 
-                      rows="2"
-                      placeholder="e.g., /images/cumin1.webp, /images/cumin2.webp"
-                      value={productForm.images ? productForm.images.join(', ') : ''}
-                      onChange={(e) => {
-                        const list = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
-                        setProductForm(prev => ({ ...prev, images: list }));
-                      }}
-                    ></textarea>
-                  </div>
-
-                  <div className="form-group-cms full-width">
-                    <label>Product Video URL / Path (Optional)</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g., https://www.w3schools.com/html/mov_bbb.mp4"
-                      value={productForm.video || ''}
-                      onChange={(e) => setProductForm(prev => ({ ...prev, video: e.target.value }))}
-                    />
+                    <label style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--primary-navy)', marginBottom: '0.5rem', display: 'block' }}>
+                      Product Video (Optional)
+                    </label>
+                    <div className="image-input-flex">
+                      <input 
+                        type="text" 
+                        placeholder="e.g., https://www.w3schools.com/html/mov_bbb.mp4"
+                        value={productForm.video || ''}
+                        onChange={(e) => setProductForm(prev => ({ ...prev, video: e.target.value }))}
+                      />
+                      {productForm.video && (
+                        <button 
+                          type="button" 
+                          className="btn-builder-remove" 
+                          title="Remove video"
+                          onClick={() => setProductForm(prev => ({ ...prev, video: '' }))}
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                    {productForm.video && (
+                      <div className="admin-video-preview mt-2">
+                        <video 
+                          src={productForm.video} 
+                          controls 
+                          muted
+                          style={{ width: '100%', maxWidth: '320px', borderRadius: '8px', border: '1px solid var(--border-soft)' }}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -3333,10 +3452,10 @@ function InquiryCard({ inquiry, onStatusChange, onDelete }) {
   return (
     <div className={`inquiry-card-wrapper ${inquiry.status} ${expanded ? 'expanded' : ''}`}>
       <div className="inquiry-card-summary" onClick={() => setExpanded(!expanded)}>
-        <span className={getStatusBadgeClass(inquiry.status)}>{inquiry.status.toUpperCase()}</span>
+        <span className={getStatusBadgeClass(inquiry.status)}>{(inquiry.status || 'new').toUpperCase()}</span>
         <div className="inquiry-meta-primary">
           <h4>{inquiry.name}</h4>
-          <span>{inquiry.email} · {inquiry.phone}</span>
+          <span>{inquiry.email || ''} · {inquiry.phone || ''}</span>
         </div>
         <div className="inquiry-meta-secondary">
           {inquiry.product && <span className="inquiry-product-tag">{inquiry.product}</span>}
@@ -3375,7 +3494,7 @@ function InquiryCard({ inquiry, onStatusChange, onDelete }) {
           
           <div className="inquiry-message-box mt-3">
             <strong>Message / Requirements:</strong>
-            <p>{inquiry.message}</p>
+            <p>{inquiry.message || 'No message provided'}</p>
           </div>
 
           <div className="inquiry-actions-row mt-3">

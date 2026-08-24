@@ -3,8 +3,6 @@ import db from '../config/database.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { requirePermission, requireRole } from '../middleware/rbac.js';
 import { sanitize } from '../middleware/validate.js';
-import fs from 'fs';
-import path from 'path';
 
 const router = Router();
 

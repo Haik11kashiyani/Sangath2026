@@ -129,7 +129,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', authenticateToken, requirePermission('products', 'all'), upload.single('image'), async (req, res) => {
   try {
-    const { name, description, category_id, video, featured, price, specifications, details, image } = req.body;
+    const { name, description, category_id, video, featured, price, specifications, details, image, images } = req.body;
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
     let imagePath = image || '/images/Cumin_Seeds.jpg';
     
@@ -198,6 +198,26 @@ router.post('/', authenticateToken, requirePermission('products', 'all'), upload
       }
     }
 
+    // Insert gallery images into product_images table
+    if (images) {
+      let imgList = images;
+      if (typeof imgList === 'string') { try { imgList = JSON.parse(imgList); } catch(e) { imgList = []; } }
+      if (Array.isArray(imgList) && imgList.length > 0) {
+        let imgSort = 0;
+        const imgStmts = [];
+        for (const imgUrl of imgList) {
+          if (imgUrl && typeof imgUrl === 'string' && imgUrl.trim()) {
+            imgSort++;
+            imgStmts.push({
+              sql: 'INSERT INTO product_images (product_id, file_path, sort_order) VALUES (?, ?, ?)',
+              args: [productId, imgUrl.trim(), imgSort]
+            });
+          }
+        }
+        if (imgStmts.length > 0) await db.batch(imgStmts, "write");
+      }
+    }
+
     res.status(201).json({ id: slug, dbId: productId, message: 'Product created successfully' });
   } catch (error) {
     console.error('Create product error:', error);
@@ -212,7 +232,7 @@ router.put('/:id', authenticateToken, requirePermission('products', 'all'), uplo
     const existing = findRes.rows[0];
     if (!existing) return res.status(404).json({ error: 'Product not found' });
 
-    const { name, description, category_id, video, featured, price, specifications, details, image } = req.body;
+    const { name, description, category_id, video, featured, price, specifications, details, image, images } = req.body;
     let updateFields = ['name = ?', 'description = ?', 'video = ?', 'featured = ?'];
     let params = [name, description || '', video || '', (featured === '1' || featured === 'true' || featured === true) ? 1 : 0];
 
@@ -230,7 +250,7 @@ router.put('/:id', authenticateToken, requirePermission('products', 'all'), uplo
 
     if (price !== undefined) {
       updateFields.push('price = ?');
-      params.push(price ? parseFloat(price) : null);
+      params.push(price !== '' && price !== null ? parseFloat(price) : null);
     }
 
     if (req.file) {
@@ -291,6 +311,27 @@ router.put('/:id', authenticateToken, requirePermission('products', 'all'), uplo
             if (itemStmts.length > 0) await db.batch(itemStmts, "write");
           }
         }
+      }
+    }
+
+    // Update gallery images if provided
+    if (images !== undefined) {
+      await db.execute({ sql: "DELETE FROM product_images WHERE product_id = ?", args: [existing.id] });
+      let imgList = images;
+      if (typeof imgList === 'string') { try { imgList = JSON.parse(imgList); } catch(e) { imgList = []; } }
+      if (Array.isArray(imgList) && imgList.length > 0) {
+        let imgSort = 0;
+        const imgStmts = [];
+        for (const imgUrl of imgList) {
+          if (imgUrl && typeof imgUrl === 'string' && imgUrl.trim()) {
+            imgSort++;
+            imgStmts.push({
+              sql: 'INSERT INTO product_images (product_id, file_path, sort_order) VALUES (?, ?, ?)',
+              args: [existing.id, imgUrl.trim(), imgSort]
+            });
+          }
+        }
+        if (imgStmts.length > 0) await db.batch(imgStmts, "write");
       }
     }
 

@@ -1,72 +1,73 @@
-import { useState, useEffect } from 'react'
-import { ArrowLeft } from 'lucide-react'
-import { sanitizeInput } from '../utils/security'
-import { submitInquiryApi } from '../utils/api'
+import { useState, useEffect, useRef } from 'react'
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react'
 import './ProductDetail.css'
 
-function ProductDetail({ product, onBack, categories, onSelectProduct, onRefreshInquiries }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    company: '',
-    country: '',
-    courier: '',
-    message: ''
-  })
-  
-  const [activeMedia, setActiveMedia] = useState(null)
+function ProductDetail({ product, onBack, categories, onSelectProduct }) {
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0)
+  const slideshowTimer = useRef(null)
+
+  // Assemble all media items (images and video)
+  const mediaItems = [];
+  if (product) {
+    if (product.images && product.images.length > 0) {
+      product.images.forEach(img => {
+        if (img && img.trim()) {
+          mediaItems.push({ type: 'image', url: img });
+        }
+      });
+    } else if (product.image) {
+      mediaItems.push({ type: 'image', url: product.image });
+    }
+    if (product.video && product.video.trim()) {
+      mediaItems.push({ type: 'video', url: product.video });
+    }
+  }
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    
-    if (product) {
-      // Set initial active media to the main product image
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveMedia({ type: 'image', url: product.image });
-    }
+    setActiveMediaIndex(0);
   }, [product])
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+  // Auto-slideshow: cycle through images every 4 seconds (skip video)
+  useEffect(() => {
+    const imageOnlyItems = mediaItems.filter(m => m.type === 'image');
+    if (imageOnlyItems.length <= 1) return;
+
+    slideshowTimer.current = setInterval(() => {
+      setActiveMediaIndex(prev => {
+        // Find next image-type index
+        let next = prev + 1;
+        while (next < mediaItems.length && mediaItems[next]?.type !== 'image') {
+          next++;
+        }
+        if (next >= mediaItems.length) {
+          // Loop back to first image
+          next = mediaItems.findIndex(m => m.type === 'image');
+        }
+        return next >= 0 ? next : 0;
+      });
+    }, 4000);
+
+    return () => {
+      if (slideshowTimer.current) clearInterval(slideshowTimer.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id, mediaItems.length])
+
+  const handleThumbnailClick = (index) => {
+    setActiveMediaIndex(index);
+    // Reset auto-slideshow timer on manual click
+    if (slideshowTimer.current) clearInterval(slideshowTimer.current);
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!product) return;
+  const handlePrevMedia = () => {
+    setActiveMediaIndex(prev => (prev > 0 ? prev - 1 : mediaItems.length - 1));
+    if (slideshowTimer.current) clearInterval(slideshowTimer.current);
+  }
 
-    try {
-      // 1. Sanitize input fields
-      const name = sanitizeInput(formData.name);
-      const company = sanitizeInput(formData.company);
-      const country = sanitizeInput(formData.country);
-      const courier = sanitizeInput(formData.courier);
-      const message = sanitizeInput(formData.message);
-
-      // 2. Save sample request via API
-      await submitInquiryApi({
-        name,
-        company,
-        country,
-        courier,
-        product: product.name,
-        subject: `Sample Request for ${product.name}`,
-        message
-      });
-
-      if (onRefreshInquiries) onRefreshInquiries();
-
-      alert(`Thank you for your sample request for ${product.name}. We will process this and contact you soon!`)
-      
-      setFormData({
-        name: '',
-        company: '',
-        country: '',
-        courier: '',
-        message: ''
-      })
-    } catch (err) {
-      alert(err.message || 'Failed to submit sample request. Please try again.');
-    }
+  const handleNextMedia = () => {
+    setActiveMediaIndex(prev => (prev < mediaItems.length - 1 ? prev + 1 : 0));
+    if (slideshowTimer.current) clearInterval(slideshowTimer.current);
   }
 
   // Get all products from the same category for the sidebar
@@ -74,20 +75,10 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, onRefresh
     cat.products && cat.products.some(p => p.id === product?.id)
   )
 
-  // Assemble all media items (images and video)
-  const mediaItems = [];
-  if (product) {
-    if (product.images && product.images.length > 0) {
-      product.images.forEach(img => {
-        mediaItems.push({ type: 'image', url: img });
-      });
-    } else if (product.image) {
-      mediaItems.push({ type: 'image', url: product.image });
-    }
-    if (product.video) {
-      mediaItems.push({ type: 'video', url: product.video });
-    }
-  }
+  const activeMedia = mediaItems[activeMediaIndex] || (product ? { type: 'image', url: product.image } : null);
+
+  // Limit thumbnails to 4 visible
+  const visibleThumbnails = mediaItems.slice(0, 4);
 
   if (!product) return null
 
@@ -119,15 +110,27 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, onRefresh
                 ) : (
                   <img src={activeMedia ? activeMedia.url : product.image} alt={product.name} />
                 )}
+                
+                {/* Navigation arrows for slideshow */}
+                {mediaItems.length > 1 && (
+                  <>
+                    <button className="media-nav-btn media-nav-prev" onClick={handlePrevMedia} aria-label="Previous image">
+                      <ChevronLeft size={22} />
+                    </button>
+                    <button className="media-nav-btn media-nav-next" onClick={handleNextMedia} aria-label="Next image">
+                      <ChevronRight size={22} />
+                    </button>
+                  </>
+                )}
               </div>
               
-              {mediaItems.length > 1 && (
+              {visibleThumbnails.length > 1 && (
                 <div className="product-media-gallery">
-                  {mediaItems.map((item, idx) => (
+                  {visibleThumbnails.map((item, idx) => (
                     <div 
                       key={idx} 
-                      className={`product-thumbnail ${activeMedia && activeMedia.url === item.url ? 'active' : ''}`}
-                      onClick={() => setActiveMedia(item)}
+                      className={`product-thumbnail ${activeMediaIndex === idx ? 'active' : ''}`}
+                      onClick={() => handleThumbnailClick(idx)}
                     >
                       {item.type === 'video' ? (
                         <>
@@ -141,6 +144,11 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, onRefresh
                       )}
                     </div>
                   ))}
+                  {mediaItems.length > 4 && (
+                    <div className="product-thumbnail more-indicator">
+                      <span>+{mediaItems.length - 4}</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -204,7 +212,7 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, onRefresh
           )}
         </div>
 
-        {/* Sidebar */}
+        {/* Sidebar - Category Navigation Only */}
         <aside className="product-sidebar">
           {currentCategory && (
             <div className="sidebar-widget">
@@ -223,65 +231,6 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, onRefresh
               </ul>
             </div>
           )}
-
-          <div className="sidebar-widget">
-            <h3 className="widget-title">Sample Request</h3>
-            <div className="sample-request-form">
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <input 
-                    type="text" 
-                    name="name" 
-                    placeholder="Name..." 
-                    value={formData.name}
-                    onChange={handleChange}
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <input 
-                    type="text" 
-                    name="company" 
-                    placeholder="Company Name..." 
-                    value={formData.company}
-                    onChange={handleChange}
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <input 
-                    type="text" 
-                    name="country" 
-                    placeholder="Country Name..." 
-                    value={formData.country}
-                    onChange={handleChange}
-                    required 
-                  />
-                </div>
-                <div className="form-group">
-                  <input 
-                    type="text" 
-                    name="courier" 
-                    placeholder="Courier Account Number..." 
-                    value={formData.courier}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <textarea 
-                    name="message" 
-                    placeholder="Message / Details..." 
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                  ></textarea>
-                </div>
-                <button type="submit" className="btn-submit-request">
-                  Send Message
-                </button>
-              </form>
-            </div>
-          </div>
         </aside>
       </div>
     </div>
@@ -289,4 +238,6 @@ function ProductDetail({ product, onBack, categories, onSelectProduct, onRefresh
 }
 
 export default ProductDetail
+
+
 

@@ -122,7 +122,7 @@ if (fs.existsSync(distDir)) {
 }
 
 // Global Error Handler
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   console.error('[SERVER ERROR]', err);
   res.status(err.status || 500).json({
     error: err.message || 'Internal Server Error'

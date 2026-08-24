@@ -67,7 +67,7 @@ export function validateImageUrl(url) {
     }
     const parsed = new URL(url);
     return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -83,9 +83,9 @@ export function validateImageFile(file) {
     return { valid: false, error: 'Only JPEG, PNG, WEBP, and GIF images are allowed.' };
   }
   
-  const maxSize = 2 * 1024 * 1024; // 2MB
+  const maxSize = 5 * 1024 * 1024; // 5MB (matches backend limit)
   if (file.size > maxSize) {
-    return { valid: false, error: 'File size must be under 2 MB.' };
+    return { valid: false, error: 'File size must be under 5 MB.' };
   }
   
   return { valid: true };

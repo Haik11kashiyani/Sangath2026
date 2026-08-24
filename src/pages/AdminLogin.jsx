@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { User, Lock, Eye, EyeOff, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { loginApi } from '../utils/api';
 import './AdminLogin.css';

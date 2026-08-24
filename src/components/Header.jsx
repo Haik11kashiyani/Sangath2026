@@ -13,7 +13,6 @@ function Header({ currentPage, setCurrentPage, websiteContent, isAdminLoggedIn, 
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
-  const [cartCount, setCartCount] = useState(0)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 18)
@@ -21,29 +20,15 @@ function Header({ currentPage, setCurrentPage, websiteContent, isAdminLoggedIn, 
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Sync Cart Count
-  const updateCartCount = () => {
-    try {
-      const cart = JSON.parse(localStorage.getItem('sangath_inquiry_cart') || '[]');
-      setCartCount(cart.length);
-    } catch (e) {
-      setCartCount(0);
-    }
-  }
-
-  useEffect(() => {
-    updateCartCount();
-    // Listen for custom event when items are added to cart
-    window.addEventListener('sangath_cart_updated', updateCartCount);
-    return () => window.removeEventListener('sangath_cart_updated', updateCartCount);
-  }, [])
 
   // Live product search
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (!searchQuery.trim()) {
       setSearchResults([]);
       return;
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
     
     fetchProductsApi()
       .then(data => {

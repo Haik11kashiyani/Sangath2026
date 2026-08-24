@@ -36,10 +36,6 @@ function Product() {
                     <p className="product-description">
                       {product.description}
                     </p>
-
-                    <button className="product-button">
-                      Inquire
-                    </button>
                   </div>
                 </div>
               ))}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './Navbar.css'
 
 const defaultMenuItems = [
@@ -6,6 +6,12 @@ const defaultMenuItems = [
   { id: 'about', label: 'ABOUT US', page: 'about', order: 2 },
   { id: 'product', label: 'OUR PRODUCTS', page: 'product', order: 3, hasDropdown: true },
   { id: 'contact', label: 'CONTACT US', page: 'contact', order: 4 }
+]
+
+const productCategories = [
+  { id: 'spices', label: 'Spices', category: 'spices' },
+  { id: 'grains', label: 'Grains & Pulses', category: 'grains' },
+  { id: 'oilseeds', label: 'Oil Seeds', category: 'oilseeds' }
 ]
 
 function Navbar({ currentPage, setCurrentPage }) {
