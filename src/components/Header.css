@@ -80,13 +80,34 @@
 
 .logo-wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 0.2rem;
+  gap: 0.6rem;
 }
 
+.logo-text-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.logo-text-primary {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--primary-navy);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.logo-text-secondary {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-body);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+/* Keep old .logo-text for backward compat */
 .logo-text {
   font-size: 0.9rem;
   font-weight: 850;
@@ -439,6 +460,14 @@
     max-width: 145px;
   }
 
+  .logo-text-primary {
+    font-size: 0.95rem;
+  }
+
+  .logo-text-secondary {
+    font-size: 0.68rem;
+  }
+
   .header-actions {
     gap: 0.5rem;
   }
@@ -458,8 +487,21 @@
 
   .header-logo img,
   .logo-image {
-    height: 46px;
+    height: 42px;
     max-width: 118px;
+  }
+
+  .logo-text-primary {
+    font-size: 0.82rem;
+  }
+
+  .logo-text-secondary {
+    font-size: 0.6rem;
+    letter-spacing: 0.8px;
+  }
+
+  .logo-wrapper {
+    gap: 0.4rem;
   }
 
   .mobile-menu-toggle {
@@ -484,8 +526,17 @@
 @media (max-width: 360px) {
   .header-logo img,
   .logo-image {
-    height: 42px;
-    max-width: 100px;
+    height: 38px;
+    max-width: 90px;
+  }
+
+  .logo-text-primary {
+    font-size: 0.75rem;
+  }
+
+  .logo-text-secondary {
+    font-size: 0.55rem;
+    letter-spacing: 0.5px;
   }
 }
 

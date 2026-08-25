@@ -199,11 +199,11 @@ function ProductDetail({ product, onBack, categories, onSelectProduct }) {
                 <tbody>
                   {product.specifications.map((spec, idx) => (
                     <tr key={idx}>
-                      <td>{spec.variety}</td>
-                      <td>{spec.origin}</td>
-                      <td>{spec.specification}</td>
-                      <td>{spec.packaging}</td>
-                      <td>{spec.fcl}</td>
+                      <td data-label="Varieties">{spec.variety}</td>
+                      <td data-label="Origin">{spec.origin}</td>
+                      <td data-label="Specification">{spec.specification}</td>
+                      <td data-label="Packaging">{spec.packaging}</td>
+                      <td data-label="FCL 20'">{spec.fcl}</td>
                     </tr>
                   ))}
                 </tbody>

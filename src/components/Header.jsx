@@ -104,7 +104,14 @@ function Header({ currentPage, setCurrentPage, websiteContent, isAdminLoggedIn, 
                   alt={brandName}
                   className="logo-image"
                 />
-                <span className="logo-text">{brandName}</span>
+                <div className="logo-text-group">
+                  <span className="logo-text-primary">
+                    {brandName.split(' ')[0] || 'Sangath'}
+                  </span>
+                  <span className="logo-text-secondary">
+                    {brandName.split(' ').slice(1).join(' ') || 'Global Exim'}
+                  </span>
+                </div>
               </div>
             </div>
 

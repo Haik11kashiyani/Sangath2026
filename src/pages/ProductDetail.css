@@ -163,7 +163,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.92);
   border: none;
   border-radius: 50%;
   width: 38px;
@@ -173,15 +173,30 @@
   justify-content: center;
   cursor: pointer;
   z-index: 5;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
   transition: all 0.2s ease;
-  color: var(--text-dark);
+  color: #1a1a2e;
+  padding: 0;
+}
+
+/* Force SVG icons inside nav arrows to be visible */
+.media-nav-btn svg {
+  color: #1a1a2e;
+  stroke: #1a1a2e;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .media-nav-btn:hover {
   background: #ffffff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   transform: translateY(-50%) scale(1.08);
+}
+
+.media-nav-btn:hover svg {
+  color: #0d1b2a;
+  stroke: #0d1b2a;
 }
 
 .media-nav-prev {
@@ -400,6 +415,61 @@
   .media-nav-btn {
     width: 32px;
     height: 32px;
+  }
+
+  .media-nav-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Mobile: Spec table as stacked cards instead of scrollable grid */
+  .spec-table {
+    min-width: 0;
+  }
+
+  .spec-table thead {
+    display: none;
+  }
+
+  .spec-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .spec-table tbody tr {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .spec-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-soft);
+    font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .spec-table tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .spec-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 800;
+    color: var(--text-dark);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    min-width: 100px;
+    flex-shrink: 0;
+    margin-right: 0.75rem;
   }
 }
 
