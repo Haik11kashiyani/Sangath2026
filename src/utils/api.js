@@ -184,7 +184,14 @@ export async function fetchInquiriesApi(page = 1, search = '') {
   const res = await fetch(`${API_BASE}/inquiries?${params.toString()}`, {
     headers: getAuthHeader()
   });
-  return handleResponse(res);
+  const data = await handleResponse(res);
+  // Normalize: server returns { items, total, page } but admin expects { inquiries }
+  return {
+    inquiries: data.items || data.inquiries || [],
+    total: data.total || 0,
+    page: data.page || 1,
+    totalPages: data.totalPages || 1
+  };
 }
 
 export async function submitInquiryApi(inquiryData) {

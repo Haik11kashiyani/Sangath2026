@@ -65,6 +65,15 @@ const apiLimiter = rateLimit({
 });
 app.use('/api/', apiLimiter);
 
+// Prevent browser/CDN caching on ALL API responses — ensures CMS changes are universal
+app.use('/api/', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+  next();
+});
+
 // Wait for DB to be ready before handling any API request (except health/debug)
 app.use('/api/', async (req, res, next) => {
   if (req.path === '/health' || req.path === '/debug') return next();
@@ -115,8 +124,20 @@ app.get('/api/debug', (req, res) => {
 // Serve frontend dist build if present (Production)
 const distDir = path.join(__dirname, '..', 'dist');
 if (fs.existsSync(distDir)) {
-  app.use(express.static(distDir));
+  app.use(express.static(distDir, {
+    // Don't cache index.html, but allow short cache for hashed assets
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.html')) {
+        res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+      }
+    }
+  }));
   app.get('*', (req, res) => {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     res.sendFile(path.join(distDir, 'index.html'));
   });
 }
