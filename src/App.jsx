@@ -18,6 +18,9 @@ import Careers from './pages/Careers'
 import Gallery from './pages/Gallery'
 import Harvest from './pages/Harvest'
 
+// Preloaders
+import Preloader from './components/Preloader'
+
 // Admin panel imports
 import AdminLogin from './pages/AdminLogin'
 import Admin from './pages/Admin'
@@ -30,6 +33,10 @@ function App() {
   const [currentPage, setCurrentPage] = useState(() => {
     return localStorage.getItem('sangath_current_page') || 'home'
   })
+
+  // Full-screen initial Preloader state
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [isPreloaderExiting, setIsPreloaderExiting] = useState(false)
 
   // Persist current page to localStorage so it survives page refresh
   useEffect(() => {
@@ -67,7 +74,10 @@ function App() {
 
   // Fetch initial content and products from API
   useEffect(() => {
-    fetchContentApi()
+    const loadStartTime = Date.now();
+    const MIN_PRELOADER_TIME = 800; // Guarantee smooth luxury entrance
+
+    const contentPromise = fetchContentApi()
       .then(data => {
         if (data && Object.keys(data).length > 0) {
           setWebsiteContent(data);
@@ -75,7 +85,7 @@ function App() {
       })
       .catch(err => console.error('Failed to load website content from API:', err));
 
-    fetchProductsApi()
+    const productsPromise = fetchProductsApi()
       .then(data => {
         if (data && data.categories) {
           setCategories(data.categories);
@@ -83,13 +93,34 @@ function App() {
       })
       .catch(err => console.error('Failed to load products from API:', err));
 
-    fetchMenuApi()
+    const menuPromise = fetchMenuApi()
       .then(data => {
         if (data && Array.isArray(data)) {
           setMenuItems(data);
         }
       })
       .catch(err => console.error('Failed to load menu from API:', err));
+
+    // Wait for critical data and smooth minimum delay before fading out preloader
+    Promise.allSettled([contentPromise, productsPromise, menuPromise]).then(() => {
+      const elapsed = Date.now() - loadStartTime;
+      const remaining = Math.max(0, MIN_PRELOADER_TIME - elapsed);
+      
+      setTimeout(() => {
+        setIsPreloaderExiting(true);
+        setTimeout(() => {
+          setIsInitialLoading(false);
+        }, 550); // Match CSS transition duration
+      }, remaining);
+    });
+
+    // Safety fallback: ensure preloader dismisses even on network failure
+    const fallbackTimer = setTimeout(() => {
+      setIsPreloaderExiting(true);
+      setTimeout(() => setIsInitialLoading(false), 550);
+    }, 3500);
+
+    return () => clearTimeout(fallbackTimer);
   }, []);
 
   // Sync SEO Metadata from CMS state on change
@@ -266,6 +297,14 @@ function App() {
 
   return (
     <div className="app">
+      {/* Full-Screen Glassmorphism Website Preloader */}
+      {isInitialLoading && (
+        <Preloader 
+          isExiting={isPreloaderExiting} 
+          brandName={websiteContent?.general?.logoText} 
+        />
+      )}
+
       {!isMinimalLayout && (
         <Header 
           currentPage={currentPage} 

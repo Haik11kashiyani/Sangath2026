@@ -200,6 +200,9 @@
   overflow: hidden;
   background:
     linear-gradient(135deg, rgba(5, 9, 17, 0.94), rgba(38, 50, 65, 0.88));
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
   color: #ffffff;
   padding: 3.5rem 2rem;
   border-radius: var(--radius);

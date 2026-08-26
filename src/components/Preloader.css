@@ -1,0 +1,334 @@
+/* ─────────────────────────────────────────────
+   PUBLIC PRELOADER — Luxury Glassmorphic Theme
+───────────────────────────────────────────── */
+.sangath-preloader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(11, 19, 32, 0.72);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  overflow: hidden;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  visibility: visible;
+}
+
+.sangath-preloader-overlay.preloader-exit {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(1.04);
+}
+
+/* Ambient Glowing Background Blobs */
+.preloader-ambient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.65;
+  pointer-events: none;
+  animation: preloaderBlobFloat 8s ease-in-out infinite alternate;
+}
+
+.blob-1 {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(199, 164, 91, 0.4), transparent 70%);
+  top: 15%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 440px;
+  height: 440px;
+  background: radial-gradient(circle, rgba(38, 50, 65, 0.7), transparent 70%);
+  bottom: 12%;
+  right: 18%;
+  animation-delay: -3s;
+}
+
+.blob-3 {
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(217, 162, 41, 0.28), transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -5s;
+}
+
+/* Center Frosted Glass Card */
+.preloader-glass-card {
+  position: relative;
+  z-index: 10;
+  width: min(90vw, 440px);
+  padding: 3rem 2.2rem 2.6rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top-color: rgba(199, 164, 91, 0.55);
+  border-bottom-color: rgba(199, 164, 91, 0.3);
+  border-radius: 24px;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(199, 164, 91, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: preloaderCardRise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Glowing Pulse Rings */
+.preloader-logo-ring-container {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.8rem;
+}
+
+.preloader-pulse-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid var(--spice-gold);
+  pointer-events: none;
+}
+
+.ring-outer {
+  width: 100%;
+  height: 100%;
+  opacity: 0.3;
+  animation: preloaderRingPulse 2.4s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  border-color: rgba(199, 164, 91, 0.4);
+}
+
+.ring-middle {
+  width: 78%;
+  height: 78%;
+  opacity: 0.6;
+  border-style: dashed;
+  animation: preloaderRingRotate 6s linear infinite;
+  border-color: var(--spice-gold);
+}
+
+.ring-inner {
+  width: 58%;
+  height: 58%;
+  opacity: 0.8;
+  border-color: #ffffff;
+  animation: preloaderRingRotateReverse 4s linear infinite;
+}
+
+.preloader-core-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0b1320, #1d2d44);
+  border: 2px solid var(--spice-gold);
+  box-shadow: 0 0 20px rgba(199, 164, 91, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.preloader-glyph {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--spice-gold);
+  text-shadow: 0 0 10px rgba(199, 164, 91, 0.8);
+  letter-spacing: 0.5px;
+}
+
+/* Brand Typography */
+.preloader-text-group {
+  margin-bottom: 1.7rem;
+}
+
+.preloader-brand-title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.brand-gold-text {
+  background: linear-gradient(135deg, #ffffff 10%, #f7e2a9 50%, #c7a45b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 4px 18px rgba(199, 164, 91, 0.3);
+}
+
+.brand-sub-text {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.preloader-tagline {
+  font-size: 0.84rem;
+  color: rgba(247, 246, 242, 0.72);
+  margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Progress bar */
+.preloader-progress-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 1.1rem;
+  position: relative;
+}
+
+.preloader-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, var(--spice-gold), #ffffff, var(--spice-gold), transparent);
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(199, 164, 91, 0.8);
+  animation: preloaderProgressMove 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Status indicator */
+.preloader-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(247, 246, 242, 0.6);
+  letter-spacing: 0.6px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--spice-gold);
+  box-shadow: 0 0 8px var(--spice-gold);
+  animation: preloaderDotPulse 1.2s ease-in-out infinite alternate;
+}
+
+/* Keyframes */
+@keyframes preloaderCardRise {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes preloaderBlobFloat {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(25px, -30px) scale(1.1);
+  }
+  100% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+}
+
+@keyframes preloaderRingRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes preloaderRingRotateReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes preloaderRingPulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.2;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0.2;
+  }
+}
+
+@keyframes preloaderProgressMove {
+  0% {
+    left: -45%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes preloaderDotPulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@media (max-width: 480px) {
+  .preloader-glass-card {
+    padding: 2.2rem 1.4rem 1.8rem;
+  }
+
+  .preloader-brand-title {
+    font-size: 1.45rem;
+  }
+
+  .preloader-tagline {
+    font-size: 0.75rem;
+    letter-spacing: 0.6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader-ambient-blob,
+  .ring-outer,
+  .ring-middle,
+  .ring-inner,
+  .preloader-progress-bar,
+  .status-dot {
+    animation: none !important;
+  }
+}

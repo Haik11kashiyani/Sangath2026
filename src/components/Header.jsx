@@ -138,7 +138,9 @@ function Header({ currentPage, setCurrentPage, websiteContent, isAdminLoggedIn, 
                       }}
                     >
                       <span className="nav-label">{item.label}</span>
-                      {item.children?.length > 0 && <span className="dropdown-arrow">▼</span>}
+                      {item.children?.length > 0 && (
+                        <span className={`dropdown-arrow ${dropdownOpen === item.id ? 'open' : ''}`}>▼</span>
+                      )}
                     </button>
                     
                     {item.children?.length > 0 && dropdownOpen === item.id && (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { User, Lock, Eye, EyeOff, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { loginApi } from '../utils/api';
+import AdminPreloader from '../components/AdminPreloader';
 import './AdminLogin.css';
 
 function AdminLogin({ setIsAdminLoggedIn, setCurrentPage, websiteContent }) {
@@ -10,6 +11,8 @@ function AdminLogin({ setIsAdminLoggedIn, setCurrentPage, websiteContent }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [shake, setShake] = useState(false);
+  const [showWelcomePreloader, setShowWelcomePreloader] = useState(false);
+  const [isPreloaderExiting, setIsPreloaderExiting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,13 +23,19 @@ function AdminLogin({ setIsAdminLoggedIn, setCurrentPage, websiteContent }) {
 
     try {
       await loginApi(username, password);
-      setIsAdminLoggedIn(true);
-      setCurrentPage('admin');
+      // Trigger "Welcome to Sangath Team" preloader
+      setShowWelcomePreloader(true);
+      setTimeout(() => {
+        setIsPreloaderExiting(true);
+        setTimeout(() => {
+          setIsAdminLoggedIn(true);
+          setCurrentPage('admin');
+        }, 450);
+      }, 1200);
     } catch (err) {
       setError(err.message || 'Invalid username or password.');
       setShake(true);
       setTimeout(() => setShake(false), 500);
-    } finally {
       setLoading(false);
     }
   }
@@ -37,6 +46,15 @@ function AdminLogin({ setIsAdminLoggedIn, setCurrentPage, websiteContent }) {
 
   return (
     <div className="login-page">
+      {/* Welcome to Sangath Team Executive Preloader */}
+      {showWelcomePreloader && (
+        <AdminPreloader 
+          isExiting={isPreloaderExiting}
+          title="Welcome to Sangath Team"
+          subtitle="Initializing Enterprise Administration & Secure Command Center..."
+        />
+      )}
+
       <div className={`login-card ${shake ? 'animate-shake' : ''}`}>
         
         <button className="btn-back-site" onClick={() => setCurrentPage('home')}>

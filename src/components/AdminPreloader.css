@@ -1,0 +1,302 @@
+/* ─────────────────────────────────────────────
+   ADMIN PRELOADER — Executive Glassmorphism Dark
+───────────────────────────────────────────── */
+.sangath-admin-preloader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 9, 17, 0.88);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  overflow: hidden;
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  visibility: visible;
+}
+
+.sangath-admin-preloader-overlay.admin-preloader-exit {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(1.03);
+}
+
+/* Background Blobs */
+.admin-preloader-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.45;
+  pointer-events: none;
+  animation: adminBlobPulse 7s ease-in-out infinite alternate;
+}
+
+.blob-gold {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(199, 164, 91, 0.35), transparent 70%);
+  top: 10%;
+  right: 15%;
+}
+
+.blob-emerald {
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(46, 125, 50, 0.35), transparent 70%);
+  bottom: 15%;
+  left: 15%;
+  animation-delay: -3.5s;
+}
+
+/* Frosted Card */
+.admin-preloader-glass-card {
+  position: relative;
+  z-index: 10;
+  width: min(92vw, 460px);
+  padding: 3.2rem 2.4rem 2.6rem;
+  background: rgba(11, 19, 32, 0.78);
+  border: 1px solid rgba(199, 164, 91, 0.3);
+  border-radius: 22px;
+  box-shadow:
+    0 35px 90px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(199, 164, 91, 0.15);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #f7f6f2;
+  animation: adminCardEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Icon / Orbits */
+.admin-preloader-icon-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.8rem;
+}
+
+.admin-pulse-orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(199, 164, 91, 0.4);
+  pointer-events: none;
+}
+
+.orbit-1 {
+  width: 100%;
+  height: 100%;
+  border-style: solid;
+  border-color: rgba(199, 164, 91, 0.3);
+  animation: adminOrbitPulse 3s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.orbit-2 {
+  width: 80%;
+  height: 80%;
+  border-style: dashed;
+  border-color: rgba(199, 164, 91, 0.7);
+  animation: adminOrbitSpin 8s linear infinite;
+}
+
+.admin-shield-badge {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #16243b, #0b1320);
+  border: 1.5px solid var(--spice-gold);
+  box-shadow: 0 0 25px rgba(199, 164, 91, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.admin-shield-svg {
+  color: var(--spice-gold);
+  filter: drop-shadow(0 0 8px rgba(199, 164, 91, 0.7));
+}
+
+/* Typography */
+.admin-preloader-text {
+  margin-bottom: 2rem;
+}
+
+.admin-badge-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: #a8d5ba;
+  background: rgba(46, 125, 50, 0.2);
+  border: 1px solid rgba(46, 125, 50, 0.4);
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  margin-bottom: 0.85rem;
+}
+
+.admin-welcome-heading {
+  font-size: 1.75rem;
+  font-weight: 850;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+  margin: 0 0 0.6rem;
+  background: linear-gradient(135deg, #ffffff 40%, #edd39a 85%, #c7a45b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-welcome-sub {
+  font-size: 0.86rem;
+  color: rgba(247, 246, 242, 0.6);
+  margin: 0;
+  line-height: 1.55;
+  max-width: 360px;
+}
+
+/* Progress Box */
+.admin-preloader-progress-box {
+  width: 100%;
+}
+
+.admin-progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+  position: relative;
+}
+
+.admin-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, transparent, #2e7d32, var(--spice-gold), #ffffff, transparent);
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(199, 164, 91, 0.8);
+  animation: adminProgressFlow 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.admin-preloader-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: rgba(247, 246, 242, 0.55);
+}
+
+.admin-status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #a8d5ba;
+  font-weight: 600;
+}
+
+.admin-dot-live {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2e7d32;
+  box-shadow: 0 0 8px #2e7d32;
+  animation: adminDotPulse 1.2s ease-in-out infinite alternate;
+}
+
+.admin-status-text {
+  font-weight: 500;
+  letter-spacing: 0.4px;
+}
+
+/* Animations */
+@keyframes adminCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes adminBlobPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0.55;
+  }
+}
+
+@keyframes adminOrbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes adminOrbitPulse {
+  0%, 100% {
+    transform: scale(0.95);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.5;
+  }
+}
+
+@keyframes adminProgressFlow {
+  0% {
+    left: -50%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes adminDotPulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-preloader-glass-card {
+    padding: 2.4rem 1.5rem 2rem;
+  }
+
+  .admin-welcome-heading {
+    font-size: 1.45rem;
+  }
+
+  .admin-preloader-meta {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+}

@@ -41,7 +41,15 @@ function Home({ setCurrentPage, websiteContent }) {
   return (
     <div className="home-page">
       {/* Hero Section */}
-      <section id="hero" className="hero-section" style={{ backgroundImage: hero.bannerImage ? `url(${hero.bannerImage})` : undefined }}>
+      <section 
+        id="hero" 
+        className="hero-section" 
+        style={{ 
+          backgroundImage: hero.bannerImage 
+            ? `linear-gradient(90deg, rgba(5, 9, 17, 0.92) 0%, rgba(11, 19, 32, 0.78) 42%, rgba(11, 19, 32, 0.38) 100%), url(${hero.bannerImage})` 
+            : undefined 
+        }}
+      >
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <h1>

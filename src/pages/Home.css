@@ -19,7 +19,10 @@
   overflow: hidden;
   background:
     linear-gradient(90deg, rgba(5, 9, 17, 0.92) 0%, rgba(11, 19, 32, 0.78) 42%, rgba(11, 19, 32, 0.28) 100%),
-    url('/images/Cumin_Seeds.jpg') center/cover;
+    url('/images/Cumin_Seeds.jpg');
+  background-position: center center;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
   isolation: isolate;
   animation: heroImageDrift 18s ease-in-out infinite alternate;
 }
@@ -536,12 +539,10 @@ section {
 
 @keyframes heroImageDrift {
   from {
-    background-position: center center;
-    background-size: auto, 100%;
+    background-position: center 50%;
   }
   to {
     background-position: center 46%;
-    background-size: auto, 106%;
   }
 }
 
