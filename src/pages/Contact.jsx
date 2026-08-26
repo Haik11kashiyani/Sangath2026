@@ -60,6 +60,7 @@ function Contact({ websiteContent, onRefreshInquiries }) {
     }
   }
 
+  const general = websiteContent?.general || {};
   const address = general.address || "RK Empire, Rajkot, Gujarat, India";
   const email = general.email || "export.sangath@gmail.com";
   const phones = general.phones || ["+91 93137 88416"];
