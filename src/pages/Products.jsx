@@ -23,7 +23,9 @@ function Products({ setCurrentPage, onViewDetails, categories, websiteContent })
   const scrollToCategory = (categoryId) => {
     const element = categoryRefs.current[categoryId]
     if (element) {
-      const headerOffset = 100
+      const headerEl = document.querySelector('.header');
+      const catNavEl = document.querySelector('.category-nav');
+      const headerOffset = (headerEl?.offsetHeight || 75) + (catNavEl?.offsetHeight || 50) + 12;
       const elementPosition = element.getBoundingClientRect().top
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset
 

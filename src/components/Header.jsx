@@ -20,6 +20,26 @@ function Header({ currentPage, setCurrentPage, websiteContent, isAdminLoggedIn, 
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Dynamically calculate and sync exact header height to CSS variable --header-height
+  useEffect(() => {
+    const headerEl = document.querySelector('.header');
+    if (!headerEl) return;
+    const updateHeaderHeight = () => {
+      const h = headerEl.offsetHeight;
+      if (h > 0) {
+        document.documentElement.style.setProperty('--header-height', `${h}px`);
+      }
+    };
+    updateHeaderHeight();
+    const ro = new ResizeObserver(updateHeaderHeight);
+    ro.observe(headerEl);
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', updateHeaderHeight);
+    };
+  }, [scrolled, mobileMenuOpen])
+
 
   // Live product search
   useEffect(() => {

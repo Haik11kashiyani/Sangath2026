@@ -1,7 +1,8 @@
 import React from 'react';
+import logo from '../assets/logo.png';
 import './Preloader.css';
 
-function Preloader({ isExiting = false, brandName = "Sangath Global Exim" }) {
+function Preloader({ isExiting = false, brandName = "Sangath Global Exim", logoImage }) {
   const primaryName = brandName.split(' ')[0] || "Sangath";
   const secondaryName = brandName.split(' ').slice(1).join(' ') || "Global Exim";
 
@@ -14,13 +15,17 @@ function Preloader({ isExiting = false, brandName = "Sangath Global Exim" }) {
 
       {/* Center Frosted Glass Card */}
       <div className="preloader-glass-card">
-        {/* Glowing Brand Icon / Rings */}
+        {/* Glowing Brand Logo with Pulse Rings */}
         <div className="preloader-logo-ring-container">
           <div className="preloader-pulse-ring ring-outer"></div>
           <div className="preloader-pulse-ring ring-middle"></div>
           <div className="preloader-pulse-ring ring-inner"></div>
           <div className="preloader-core-icon">
-            <span className="preloader-glyph">S</span>
+            <img 
+              src={logoImage || logo} 
+              alt={brandName} 
+              className="preloader-logo-img" 
+            />
           </div>
         </div>
 
@@ -41,7 +46,7 @@ function Preloader({ isExiting = false, brandName = "Sangath Global Exim" }) {
         {/* Subtle Status */}
         <div className="preloader-status">
           <span className="status-dot"></span>
-          <span>Loading Experience...</span>
+          <span>Loading...</span>
         </div>
       </div>
     </div>

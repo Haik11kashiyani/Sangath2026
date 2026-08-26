@@ -302,6 +302,7 @@ function App() {
         <Preloader 
           isExiting={isPreloaderExiting} 
           brandName={websiteContent?.general?.logoText} 
+          logoImage={websiteContent?.general?.logoImage}
         />
       )}
 

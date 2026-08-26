@@ -5,13 +5,15 @@
 
 .category-nav {
   position: sticky;
-  top: 106px;
-  z-index: 20;
-  padding: 1.1rem 0;
+  top: var(--header-height, 86px);
+  z-index: 90;
+  padding: 0.75rem 0;
   margin-bottom: 3rem;
-  background: rgba(251, 248, 239, 0.92);
+  background: rgba(251, 248, 239, 0.96);
   border-bottom: 1px solid var(--border-soft);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: top 0.15s ease;
 }
 
 .category-nav-list {
@@ -243,8 +245,14 @@
 
 @media (max-width: 768px) {
   .category-nav {
-    position: relative;
-    top: auto;
+    top: var(--header-height, 68px);
+    padding: 0.6rem 0;
+    margin-bottom: 2rem;
+  }
+
+  .category-nav-link {
+    padding: 0.55rem 0.95rem;
+    font-size: 0.88rem;
   }
 
   .products-grid {
