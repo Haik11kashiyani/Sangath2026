@@ -121,17 +121,38 @@ img, video {
   animation: pageHeaderReveal 0.8s ease both;
 }
 
+.section-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.page-header.has-bg-video::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(5, 9, 17, 0.88), rgba(38, 50, 65, 0.76));
+  z-index: 1;
+  pointer-events: none;
+}
+
 .page-header::after {
   content: '';
   position: absolute;
   inset: auto 0 0;
   height: 6px;
   background: linear-gradient(90deg, transparent, var(--spice-gold), transparent);
+  z-index: 2;
 }
 
 .page-header .container {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   animation: contentRise 0.72s ease 0.08s both;
 }
 

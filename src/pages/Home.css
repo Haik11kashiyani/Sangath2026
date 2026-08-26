@@ -438,6 +438,23 @@ section {
   text-align: center;
 }
 
+/* Background Video Engine */
+.section-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero-section.has-bg-video,
+.footer-cta.has-bg-video {
+  background: #050911;
+}
+
 .footer-cta {
   position: relative;
   overflow: hidden;
@@ -445,6 +462,9 @@ section {
     linear-gradient(135deg, rgba(5, 9, 17, 0.95), rgba(38, 50, 65, 0.9));
   color: #ffffff;
   text-align: center;
+  padding: 6rem 0 6.5rem;
+  margin-bottom: -2.5rem;
+  z-index: 2;
 }
 
 .footer-cta::before {
@@ -453,11 +473,29 @@ section {
   inset: 0;
   background: linear-gradient(90deg, rgba(217, 162, 41, 0.12), transparent);
   animation: heroGlowShift 9s ease-in-out infinite alternate;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Seamless Bottom Gradient Blend Melting into Footer */
+.footer-cta-blend-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 160px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    rgba(5, 9, 17, 0.3) 25%, 
+    rgba(5, 9, 17, 0.75) 60%, 
+    rgba(5, 9, 17, 0.96) 88%, 
+    #050911 100%
+  );
+  pointer-events: none;
+  z-index: 2;
 }
 
 .cta-content {
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 .cta-content h2 {

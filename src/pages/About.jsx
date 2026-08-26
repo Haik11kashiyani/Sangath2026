@@ -1,6 +1,7 @@
 import { Check, Globe2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { getCountryFlagUrl } from '../utils/flags'
+import { useCachedVideo } from '../utils/videoCache'
 import './About.css'
 
 function About({ websiteContent }) {
@@ -43,17 +44,32 @@ function About({ websiteContent }) {
     bannerImage: bannerImage
   };
   const bannerUrl = header.bannerImage || bannerImage;
+  const cachedHeaderVideo = useCachedVideo(header.bannerVideo);
 
   return (
     <div className="about-page">
       <div 
-        className="page-header"
+        className={`page-header ${header.bannerVideo ? 'has-bg-video' : ''}`}
         style={{ 
-          backgroundImage: `linear-gradient(135deg, rgba(5, 9, 17, 0.82), rgba(38, 50, 65, 0.72)), url('${bannerUrl}')`,
+          backgroundImage: (!header.bannerVideo && bannerUrl)
+            ? `linear-gradient(135deg, rgba(5, 9, 17, 0.82), rgba(38, 50, 65, 0.72)), url('${bannerUrl}')`
+            : undefined,
           backgroundPosition: 'center',
           backgroundSize: 'cover'
         }}
       >
+        {header.bannerVideo && (
+          <video
+            src={cachedHeaderVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="section-bg-video"
+            poster={bannerUrl || undefined}
+          />
+        )}
         <div className="container">
           <h1>{header.title}</h1>
           <p className="page-subtitle">{header.subtitle}</p>

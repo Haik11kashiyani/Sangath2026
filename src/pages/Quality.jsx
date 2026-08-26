@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Check } from 'lucide-react'
+import { useCachedVideo } from '../utils/videoCache'
 import './Quality.css'
 
 function Quality({ websiteContent }) {
@@ -30,16 +31,33 @@ function Quality({ websiteContent }) {
     bannerImage: "/images/Cumin_Seeds.jpg"
   };
 
+  const cachedHeaderVideo = useCachedVideo(header.bannerVideo);
+  const cachedEthicsVideo = useCachedVideo(ethics.bannerVideo);
+
   return (
     <div className="quality-page">
       <div 
-        className="page-header"
+        className={`page-header ${header.bannerVideo ? 'has-bg-video' : ''}`}
         style={{
-          backgroundImage: `linear-gradient(135deg, rgba(5, 9, 17, 0.92), rgba(38, 50, 65, 0.84)), url('${header.bannerImage || '/images/Cumin_Seeds.jpg'}')`,
+          backgroundImage: (!header.bannerVideo && (header.bannerImage || '/images/Cumin_Seeds.jpg'))
+            ? `linear-gradient(135deg, rgba(5, 9, 17, 0.92), rgba(38, 50, 65, 0.84)), url('${header.bannerImage || '/images/Cumin_Seeds.jpg'}')`
+            : undefined,
           backgroundPosition: 'center',
           backgroundSize: 'cover'
         }}
       >
+        {header.bannerVideo && (
+          <video
+            src={cachedHeaderVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="section-bg-video"
+            poster={header.bannerImage || undefined}
+          />
+        )}
         <div className="container">
           <h1>{header.title}</h1>
           <p className="page-subtitle">{header.subtitle}</p>
@@ -114,17 +132,33 @@ function Quality({ websiteContent }) {
         {/* Ethics Statement */}
         <section className="ethics-statement">
           <div 
-            className="ethics-box"
+            className={`ethics-box ${ethics.bannerVideo ? 'has-bg-video' : ''}`}
             style={{
-              backgroundImage: `linear-gradient(135deg, rgba(5, 9, 17, 0.94), rgba(38, 50, 65, 0.88)), url('${ethics.bannerImage || '/images/Fenugreek_Powder.webp'}')`,
+              backgroundImage: (!ethics.bannerVideo && (ethics.bannerImage || '/images/Fenugreek_Powder.webp'))
+                ? `linear-gradient(135deg, rgba(5, 9, 17, 0.94), rgba(38, 50, 65, 0.88)), url('${ethics.bannerImage || '/images/Fenugreek_Powder.webp'}')`
+                : undefined,
               backgroundPosition: 'center',
               backgroundSize: 'cover'
             }}
           >
-            <h2>{ethics.title || "Our Commitment"}</h2>
-            {ethics.paragraphs && ethics.paragraphs.map((p, idx) => (
-              <p key={idx}>{p}</p>
-            ))}
+            {ethics.bannerVideo && (
+              <video
+                src={cachedEthicsVideo}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                className="section-bg-video"
+                poster={ethics.bannerImage || undefined}
+              />
+            )}
+            <div className="ethics-content-inner" style={{ position: 'relative', zIndex: 2 }}>
+              <h2>{ethics.title || "Our Commitment"}</h2>
+              {ethics.paragraphs && ethics.paragraphs.map((p, idx) => (
+                <p key={idx}>{p}</p>
+              ))}
+            </div>
           </div>
         </section>
       </div>

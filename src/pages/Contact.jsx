@@ -2,6 +2,7 @@ import { MailOpen, Building2, PhoneCall } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { sanitizeInput } from '../utils/security'
 import { submitInquiryApi } from '../utils/api'
+import { useCachedVideo } from '../utils/videoCache'
 import './Contact.css'
 
 function Contact({ websiteContent, onRefreshInquiries }) {
@@ -59,8 +60,6 @@ function Contact({ websiteContent, onRefreshInquiries }) {
     }
   }
 
-  // Extract contact info from CMS
-  const general = websiteContent?.general || {};
   const address = general.address || "RK Empire, Rajkot, Gujarat, India";
   const email = general.email || "export.sangath@gmail.com";
   const phones = general.phones || ["+91 93137 88416"];
@@ -71,16 +70,32 @@ function Contact({ websiteContent, onRefreshInquiries }) {
     bannerImage: "/images/Cumin_Seeds.jpg"
   };
 
+  const cachedHeaderVideo = useCachedVideo(header.bannerVideo);
+
   return (
     <div className="contact-page">
       <div 
-        className="page-header"
+        className={`page-header ${header.bannerVideo ? 'has-bg-video' : ''}`}
         style={{
-          backgroundImage: `linear-gradient(135deg, rgba(5, 9, 17, 0.92), rgba(38, 50, 65, 0.84)), url('${header.bannerImage || '/images/Cumin_Seeds.jpg'}')`,
+          backgroundImage: (!header.bannerVideo && (header.bannerImage || '/images/Cumin_Seeds.jpg'))
+            ? `linear-gradient(135deg, rgba(5, 9, 17, 0.92), rgba(38, 50, 65, 0.84)), url('${header.bannerImage || '/images/Cumin_Seeds.jpg'}')`
+            : undefined,
           backgroundPosition: 'center',
           backgroundSize: 'cover'
         }}
       >
+        {header.bannerVideo && (
+          <video
+            src={cachedHeaderVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="section-bg-video"
+            poster={header.bannerImage || undefined}
+          />
+        )}
         <div className="container">
           <h1>{header.title}</h1>
           <p className="page-subtitle">{header.subtitle}</p>

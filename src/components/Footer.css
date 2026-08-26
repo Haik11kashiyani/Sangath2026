@@ -2,10 +2,11 @@
   position: relative;
   overflow: hidden;
   background:
-    linear-gradient(135deg, rgba(5, 9, 17, 0.98), rgba(28, 39, 53, 0.96));
+    linear-gradient(180deg, #050911 0%, rgba(5, 9, 17, 0.98) 20%, rgba(28, 39, 53, 0.96) 100%);
   color: #ffffff;
-  padding: 4.5rem 0 1.25rem;
+  padding: 5.5rem 0 1.25rem;
   margin-top: 0;
+  z-index: 3;
 }
 
 .footer::before {
@@ -13,6 +14,7 @@
   position: absolute;
   inset: 0;
   background:
+    linear-gradient(180deg, rgba(5, 9, 17, 0.95) 0%, transparent 25%),
     linear-gradient(90deg, rgba(199, 164, 91, 0.14), transparent 35%),
     radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.08), transparent 28rem);
   pointer-events: none;

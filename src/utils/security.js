@@ -78,8 +78,8 @@ export function validateImageUrl(url) {
  * @returns {{valid: boolean, error?: string}}
  */
 export function validateImageFile(file) {
-  const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-  if (!validTypes.includes(file.type)) {
+  const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+  if (!validTypes.includes(file.type) && !file.name.match(/\.(jpg|jpeg|png|webp|gif|svg)$/i)) {
     return { valid: false, error: 'Only JPEG, PNG, WEBP, and GIF images are allowed.' };
   }
   
@@ -89,6 +89,33 @@ export function validateImageFile(file) {
   }
   
   return { valid: true };
+}
+
+/**
+ * Validate uploaded media file (images up to 5MB, videos up to 30MB)
+ * @param {File} file 
+ * @returns {{valid: boolean, isVideo?: boolean, error?: string}}
+ */
+export function validateMediaFile(file) {
+  if (!file) return { valid: false, error: 'No file selected.' };
+
+  const isVideo = (file.type && file.type.startsWith('video/')) || Boolean(file.name && file.name.match(/\.(mp4|webm|ogg|mov)$/i));
+  if (isVideo) {
+    const validVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
+    if (!validVideoTypes.includes(file.type) && !file.name.match(/\.(mp4|webm|ogg|mov)$/i)) {
+      return { valid: false, error: 'Only MP4, WebM, OGG, and MOV video files are allowed.' };
+    }
+    const maxVideoSize = 30 * 1024 * 1024; // 30MB max
+    if (file.size > maxVideoSize) {
+      return { 
+        valid: false, 
+        error: `Video size (${(file.size / (1024 * 1024)).toFixed(1)} MB) exceeds maximum limit of 30 MB. Please compress or optimize the video.` 
+      };
+    }
+    return { valid: true, isVideo: true };
+  }
+
+  return validateImageFile(file);
 }
 
 /**

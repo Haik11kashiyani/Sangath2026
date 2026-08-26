@@ -25,7 +25,7 @@ import {
   MoveUp,
   MoveDown
 } from 'lucide-react';
-import { sanitizeInput, validateImageFile } from '../utils/security';
+import { sanitizeInput, validateImageFile, validateMediaFile } from '../utils/security';
 import { getCountryFlagUrl } from '../utils/flags';
 import { resetToDefaults } from '../utils/storage';
 import {
@@ -476,24 +476,50 @@ function Admin({
     const file = e.target.files[0];
     if (!file) return;
 
-    const validation = validateImageFile(file);
+    const validation = validateMediaFile(file);
     if (!validation.valid) {
       alert(validation.error);
       return;
     }
 
     try {
-      const res = await uploadSiteImageApi(pageKey, 'header', 'bannerImage', file);
+      const field = validation.isVideo ? 'bannerVideo' : 'bannerImage';
+      const res = await uploadSiteImageApi(pageKey, 'header', field, file);
       const pageData = cmsDraft[pageKey] || {};
       const headerData = pageData.header || {};
       const updatedPage = {
         ...pageData,
-        header: { ...headerData, bannerImage: res.file_path }
+        header: { ...headerData, [field]: res.file_path }
       };
       handleDraftChange(pageKey, updatedPage);
-      triggerToast('Header banner image uploaded successfully to server');
+      triggerToast(`Header ${validation.isVideo ? 'video' : 'banner image'} uploaded successfully`);
     } catch (err) {
-      triggerToast(err.message || 'Image upload failed', 'error');
+      triggerToast(err.message || 'Media upload failed', 'error');
+    }
+  }
+
+  const handleSiteMediaUpload = async (pageKey, section, key, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const validation = validateMediaFile(file);
+    if (!validation.valid) {
+      alert(validation.error);
+      return;
+    }
+
+    try {
+      const res = await uploadSiteImageApi(pageKey, section, key, file);
+      const pageData = cmsDraft[pageKey] || {};
+      const sectionData = pageData[section] || {};
+      const updatedPage = {
+        ...pageData,
+        [section]: { ...sectionData, [key]: res.file_path }
+      };
+      handleDraftChange(pageKey, updatedPage);
+      triggerToast(`${validation.isVideo ? 'Video' : 'Media'} uploaded successfully`);
+    } catch (err) {
+      triggerToast(err.message || 'Media upload failed', 'error');
     }
   }
 
@@ -501,7 +527,7 @@ function Admin({
     const file = e.target.files[0];
     if (!file) return;
 
-    const validation = validateImageFile(file);
+    const validation = validateMediaFile(file);
     if (!validation.valid) {
       alert(validation.error);
       return;
@@ -518,9 +544,9 @@ function Admin({
         [section]: { ...sectionData, [key]: res.file_path }
       };
       handleDraftChange(pageKey, updatedPage);
-      triggerToast('Image uploaded successfully');
+      triggerToast(`${validation.isVideo ? 'Video' : 'Image'} uploaded successfully`);
     } catch (err) {
-      triggerToast(err.message || 'Image upload failed', 'error');
+      triggerToast(err.message || 'Upload failed', 'error');
     }
   }
 
@@ -589,7 +615,7 @@ function Admin({
 
     return (
       <div className="cms-header-banner-section mb-4">
-        <h4>Page Header Banner Settings</h4>
+        <h4>Page Header Banner &amp; Media Settings</h4>
         <div className="form-grid">
           <div className="form-group-cms">
             <label>Banner Title</label>
@@ -608,18 +634,20 @@ function Admin({
             />
           </div>
         </div>
+
+        {/* Banner Image */}
         <div className="form-group-cms mt-2 full-width">
-          <label>Banner Image Path / Upload (Optional)</label>
+          <label>Banner Image (Fallback / Background)</label>
           <div className="image-input-flex">
             <input 
               type="text" 
-              placeholder="e.g. /images/my-banner.jpg or paste base64 data"
+              placeholder="e.g. /images/my-banner.jpg or paste URL"
               value={header.bannerImage || ''}
               onChange={(e) => updateHeaderField('bannerImage', sanitizeInput(e.target.value))}
             />
             <span className="file-or-span">OR</span>
             <div className="btn-file-wrapper">
-              <span>Upload Banner</span>
+              <span>Upload Image</span>
               <input 
                 type="file" 
                 accept="image/*" 
@@ -629,11 +657,55 @@ function Admin({
           </div>
           {header.bannerImage && (
             <div className="uploaded-thumb-preview mt-2">
-              <span>Preview:</span>
-              <img src={header.bannerImage} alt="Header Preview" style={{ width: '120px', height: '50px', background: '#f5f5f5', padding: '2px', borderRadius: '4px', objectFit: 'cover' }} />
+              <span>Image Preview:</span>
+              <img src={header.bannerImage} alt="Header Preview" style={{ width: '140px', height: '54px', background: '#f5f5f5', padding: '2px', borderRadius: '6px', objectFit: 'cover' }} />
             </div>
           )}
         </div>
+
+        {/* Banner Video */}
+        <div className="form-group-cms mt-2 full-width">
+          <label>Banner Video (Optional MP4 / WebM / URL - Max 30MB)</label>
+          <div className="image-input-flex">
+            <input 
+              type="text" 
+              placeholder="e.g. /videos/hero.mp4 or Cloudinary/CDN video URL"
+              value={header.bannerVideo || ''}
+              onChange={(e) => updateHeaderField('bannerVideo', sanitizeInput(e.target.value))}
+            />
+            <span className="file-or-span">OR</span>
+            <div className="btn-file-wrapper">
+              <span>Upload Video</span>
+              <input 
+                type="file" 
+                accept="video/mp4,video/webm,video/ogg,video/quicktime" 
+                onChange={(e) => handlePageHeaderImageUpload(pageKey, e)}
+              />
+            </div>
+            {header.bannerVideo && (
+              <button
+                type="button"
+                className="btn-list-delete ml-2"
+                title="Remove Video"
+                onClick={() => updateHeaderField('bannerVideo', '')}
+              >
+                <Trash2 size={16} />
+              </button>
+            )}
+          </div>
+          {header.bannerVideo && (
+            <div className="uploaded-thumb-preview mt-2">
+              <span>Video Preview:</span>
+              <video 
+                src={header.bannerVideo} 
+                controls 
+                muted 
+                style={{ width: '200px', maxHeight: '100px', background: '#000', borderRadius: '6px' }} 
+              />
+            </div>
+          )}
+        </div>
+
         <hr className="divider-cms mt-4" />
       </div>
     );
@@ -1345,8 +1417,9 @@ function Admin({
                       }}
                     />
                   </div>
+                  {/* Hero Banner Image */}
                   <div className="form-group-cms full-width">
-                    <label>Hero Banner Image URL</label>
+                    <label>Hero Banner Image (Fallback / Background)</label>
                     <div className="image-input-flex">
                       <input 
                         type="text" 
@@ -1359,7 +1432,7 @@ function Admin({
                       />
                       <span className="file-or-span">OR</span>
                       <div className="btn-file-wrapper">
-                        <span>Upload Banner</span>
+                        <span>Upload Image</span>
                         <input 
                           type="file" 
                           accept="image/*" 
@@ -1367,6 +1440,61 @@ function Admin({
                         />
                       </div>
                     </div>
+                    {cmsDraft.home.hero.bannerImage && (
+                      <div className="uploaded-thumb-preview mt-2">
+                        <span>Image Preview:</span>
+                        <img src={cmsDraft.home.hero.bannerImage} alt="Hero Banner Preview" style={{ width: '140px', height: '54px', background: '#f5f5f5', padding: '2px', borderRadius: '6px', objectFit: 'cover' }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Hero Banner Video */}
+                  <div className="form-group-cms full-width">
+                    <label>Hero Background Video (Optional MP4 / WebM / URL - Max 30MB)</label>
+                    <div className="image-input-flex">
+                      <input 
+                        type="text" 
+                        placeholder="e.g. /videos/hero.mp4 or Cloudinary/CDN video URL"
+                        value={cmsDraft.home.hero.bannerVideo || ''}
+                        onChange={(e) => {
+                          const updatedHero = { ...cmsDraft.home.hero, bannerVideo: sanitizeInput(e.target.value) };
+                          handleDraftChange('home.hero', updatedHero);
+                        }}
+                      />
+                      <span className="file-or-span">OR</span>
+                      <div className="btn-file-wrapper">
+                        <span>Upload Video</span>
+                        <input 
+                          type="file" 
+                          accept="video/mp4,video/webm,video/ogg,video/quicktime" 
+                          onChange={(e) => handleSiteMediaUpload('home', 'hero', 'bannerVideo', e)}
+                        />
+                      </div>
+                      {cmsDraft.home.hero.bannerVideo && (
+                        <button
+                          type="button"
+                          className="btn-list-delete ml-2"
+                          title="Remove Video"
+                          onClick={() => {
+                            const updatedHero = { ...cmsDraft.home.hero, bannerVideo: '' };
+                            handleDraftChange('home.hero', updatedHero);
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                    {cmsDraft.home.hero.bannerVideo && (
+                      <div className="uploaded-thumb-preview mt-2">
+                        <span>Video Preview:</span>
+                        <video 
+                          src={cmsDraft.home.hero.bannerVideo} 
+                          controls 
+                          muted 
+                          style={{ width: '220px', maxHeight: '110px', background: '#000', borderRadius: '6px' }} 
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="form-group-cms full-width">
                     <label>Hero Description</label>
@@ -1515,8 +1643,9 @@ function Admin({
                       }}
                     />
                   </div>
+                  {/* CTA Image */}
                   <div className="form-group-cms full-width">
-                    <label>CTA Background Image URL</label>
+                    <label>CTA Background Image (Fallback / Background)</label>
                     <div className="image-input-flex">
                       <input 
                         type="text" 
@@ -1537,6 +1666,61 @@ function Admin({
                         />
                       </div>
                     </div>
+                    {cmsDraft.home.cta?.bannerImage && (
+                      <div className="uploaded-thumb-preview mt-2">
+                        <span>Image Preview:</span>
+                        <img src={cmsDraft.home.cta.bannerImage} alt="CTA Preview" style={{ width: '140px', height: '54px', background: '#f5f5f5', padding: '2px', borderRadius: '6px', objectFit: 'cover' }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CTA Video */}
+                  <div className="form-group-cms full-width">
+                    <label>CTA Background Video (Optional MP4 / WebM / URL - Max 30MB)</label>
+                    <div className="image-input-flex">
+                      <input 
+                        type="text" 
+                        placeholder="e.g. /videos/cargo_port.mp4 or Cloudinary/CDN video URL"
+                        value={cmsDraft.home.cta?.bannerVideo || ''}
+                        onChange={(e) => {
+                          const updatedCta = { ...(cmsDraft.home.cta || {}), bannerVideo: sanitizeInput(e.target.value) };
+                          handleDraftChange('home.cta', updatedCta);
+                        }}
+                      />
+                      <span className="file-or-span">OR</span>
+                      <div className="btn-file-wrapper">
+                        <span>Upload Video</span>
+                        <input 
+                          type="file" 
+                          accept="video/mp4,video/webm,video/ogg,video/quicktime" 
+                          onChange={(e) => handleSiteMediaUpload('home', 'cta', 'bannerVideo', e)}
+                        />
+                      </div>
+                      {cmsDraft.home.cta?.bannerVideo && (
+                        <button
+                          type="button"
+                          className="btn-list-delete ml-2"
+                          title="Remove Video"
+                          onClick={() => {
+                            const updatedCta = { ...(cmsDraft.home.cta || {}), bannerVideo: '' };
+                            handleDraftChange('home.cta', updatedCta);
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                    {cmsDraft.home.cta?.bannerVideo && (
+                      <div className="uploaded-thumb-preview mt-2">
+                        <span>Video Preview:</span>
+                        <video 
+                          src={cmsDraft.home.cta.bannerVideo} 
+                          controls 
+                          muted 
+                          style={{ width: '220px', maxHeight: '110px', background: '#000', borderRadius: '6px' }} 
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

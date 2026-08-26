@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { ShieldCheck, Globe, Boxes, Star, BadgeCheck } from 'lucide-react'
 import { getCountryFlagUrl } from '../utils/flags'
+import { useCachedVideo } from '../utils/videoCache'
 import './Home.css'
 
 function Home({ setCurrentPage, websiteContent }) {
@@ -18,6 +19,9 @@ function Home({ setCurrentPage, websiteContent }) {
     tagline: "Global Trading & Marketing of Agricultural Commodities",
     description: "Your trusted partner for global agricultural commodity exports and imports."
   };
+
+  const cachedHeroVideo = useCachedVideo(hero.bannerVideo);
+  const cachedCtaVideo = useCachedVideo(homeData.cta?.bannerVideo);
   
   const aboutSnapshot = homeData.aboutSnapshot || {
     title: "About Sangath Global Exim",
@@ -43,13 +47,26 @@ function Home({ setCurrentPage, websiteContent }) {
       {/* Hero Section */}
       <section 
         id="hero" 
-        className="hero-section" 
+        className={`hero-section ${hero.bannerVideo ? 'has-bg-video' : ''}`}
         style={{ 
-          backgroundImage: hero.bannerImage 
+          backgroundImage: (!hero.bannerVideo && hero.bannerImage)
             ? `linear-gradient(90deg, rgba(5, 9, 17, 0.92) 0%, rgba(11, 19, 32, 0.78) 42%, rgba(11, 19, 32, 0.38) 100%), url(${hero.bannerImage})` 
             : undefined 
         }}
       >
+        {/* Background Video Support */}
+        {hero.bannerVideo && (
+          <video
+            src={cachedHeroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="section-bg-video"
+            poster={hero.bannerImage || undefined}
+          />
+        )}
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <h1>
@@ -161,13 +178,30 @@ function Home({ setCurrentPage, websiteContent }) {
 
       {/* Footer CTA */}
       <section 
-        className="footer-cta"
+        className={`footer-cta ${homeData.cta?.bannerVideo ? 'has-bg-video' : ''}`}
         style={{
-          backgroundImage: `linear-gradient(135deg, rgba(5, 9, 17, 0.95), rgba(38, 50, 65, 0.9)), url('${homeData.cta?.bannerImage || '/images/red_chilli.jpeg'}')`,
+          backgroundImage: (!homeData.cta?.bannerVideo && (homeData.cta?.bannerImage || '/images/red_chilli.jpeg'))
+            ? `linear-gradient(135deg, rgba(5, 9, 17, 0.92), rgba(38, 50, 65, 0.88)), url('${homeData.cta?.bannerImage || '/images/red_chilli.jpeg'}')`
+            : undefined,
           backgroundPosition: 'center',
           backgroundSize: 'cover'
         }}
       >
+        {/* Video Background for CTA */}
+        {homeData.cta?.bannerVideo && (
+          <video
+            src={cachedCtaVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="section-bg-video"
+            poster={homeData.cta?.bannerImage || undefined}
+          />
+        )}
+        {/* Seamless Blend Overlay Melting into Footer */}
+        <div className="footer-cta-blend-overlay"></div>
         <div className="container">
           <div className="cta-content">
             <h2>{homeData.cta?.title || "Ready to Partner With Us?"}</h2>

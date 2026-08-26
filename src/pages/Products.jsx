@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useCachedVideo } from '../utils/videoCache'
 import './Products.css'
 
 function Products({ setCurrentPage, onViewDetails, categories, websiteContent }) {
@@ -42,16 +43,32 @@ function Products({ setCurrentPage, onViewDetails, categories, websiteContent })
     bannerImage: "/images/Cumin_Seeds.jpg"
   };
 
+  const cachedHeaderVideo = useCachedVideo(header.bannerVideo);
+
   return (
     <div className="products-page">
       <div 
-        className="page-header"
+        className={`page-header ${header.bannerVideo ? 'has-bg-video' : ''}`}
         style={{
-          backgroundImage: `linear-gradient(135deg, rgba(5, 9, 17, 0.92), rgba(38, 50, 65, 0.84)), url('${header.bannerImage || '/images/Cumin_Seeds.jpg'}')`,
+          backgroundImage: (!header.bannerVideo && (header.bannerImage || '/images/Cumin_Seeds.jpg'))
+            ? `linear-gradient(135deg, rgba(5, 9, 17, 0.92), rgba(38, 50, 65, 0.84)), url('${header.bannerImage || '/images/Cumin_Seeds.jpg'}')`
+            : undefined,
           backgroundPosition: 'center',
           backgroundSize: 'cover'
         }}
       >
+        {header.bannerVideo && (
+          <video
+            src={cachedHeaderVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            className="section-bg-video"
+            poster={header.bannerImage || undefined}
+          />
+        )}
         <div className="container">
           <h1>{header.title}</h1>
           <p className="page-subtitle">{header.subtitle}</p>
