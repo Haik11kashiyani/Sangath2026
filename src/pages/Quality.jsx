@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { Check } from 'lucide-react'
-import { useCachedVideo } from '../utils/videoCache'
 import './Quality.css'
 
 function Quality({ websiteContent }) {
@@ -31,9 +30,6 @@ function Quality({ websiteContent }) {
     bannerImage: "/images/Cumin_Seeds.jpg"
   };
 
-  const cachedHeaderVideo = useCachedVideo(header.bannerVideo);
-  const cachedEthicsVideo = useCachedVideo(ethics.bannerVideo);
-
   return (
     <div className="quality-page">
       <div 
@@ -48,7 +44,7 @@ function Quality({ websiteContent }) {
       >
         {header.bannerVideo && (
           <video
-            src={cachedHeaderVideo}
+            src={header.bannerVideo}
             autoPlay
             loop
             muted
@@ -143,7 +139,7 @@ function Quality({ websiteContent }) {
           >
             {ethics.bannerVideo && (
               <video
-                src={cachedEthicsVideo}
+                src={ethics.bannerVideo}
                 autoPlay
                 loop
                 muted

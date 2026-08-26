@@ -52,6 +52,7 @@ function AdminLogin({ setIsAdminLoggedIn, setCurrentPage, websiteContent }) {
           isExiting={isPreloaderExiting}
           title="Welcome to Sangath Team"
           subtitle="Initializing Enterprise Administration & Secure Command Center..."
+          logoImage={websiteContent?.general?.logoImage}
         />
       )}
 

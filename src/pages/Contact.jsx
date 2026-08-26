@@ -2,7 +2,6 @@ import { MailOpen, Building2, PhoneCall } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { sanitizeInput } from '../utils/security'
 import { submitInquiryApi } from '../utils/api'
-import { useCachedVideo } from '../utils/videoCache'
 import './Contact.css'
 
 function Contact({ websiteContent, onRefreshInquiries }) {
@@ -71,8 +70,6 @@ function Contact({ websiteContent, onRefreshInquiries }) {
     bannerImage: "/images/Cumin_Seeds.jpg"
   };
 
-  const cachedHeaderVideo = useCachedVideo(header.bannerVideo);
-
   return (
     <div className="contact-page">
       <div 
@@ -87,7 +84,7 @@ function Contact({ websiteContent, onRefreshInquiries }) {
       >
         {header.bannerVideo && (
           <video
-            src={cachedHeaderVideo}
+            src={header.bannerVideo}
             autoPlay
             loop
             muted

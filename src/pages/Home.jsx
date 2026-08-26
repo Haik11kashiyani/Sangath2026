@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { ShieldCheck, Globe, Boxes, Star, BadgeCheck } from 'lucide-react'
 import { getCountryFlagUrl } from '../utils/flags'
-import { useCachedVideo } from '../utils/videoCache'
 import './Home.css'
 
 function Home({ setCurrentPage, websiteContent }) {
@@ -19,9 +18,6 @@ function Home({ setCurrentPage, websiteContent }) {
     tagline: "Global Trading & Marketing of Agricultural Commodities",
     description: "Your trusted partner for global agricultural commodity exports and imports."
   };
-
-  const cachedHeroVideo = useCachedVideo(hero.bannerVideo);
-  const cachedCtaVideo = useCachedVideo(homeData.cta?.bannerVideo);
   
   const aboutSnapshot = homeData.aboutSnapshot || {
     title: "About Sangath Global Exim",
@@ -57,7 +53,7 @@ function Home({ setCurrentPage, websiteContent }) {
         {/* Background Video Support */}
         {hero.bannerVideo && (
           <video
-            src={cachedHeroVideo}
+            src={hero.bannerVideo}
             autoPlay
             loop
             muted
@@ -190,7 +186,7 @@ function Home({ setCurrentPage, websiteContent }) {
         {/* Video Background for CTA */}
         {homeData.cta?.bannerVideo && (
           <video
-            src={cachedCtaVideo}
+            src={homeData.cta.bannerVideo}
             autoPlay
             loop
             muted

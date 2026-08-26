@@ -74,6 +74,11 @@ function App() {
 
   // Fetch initial content and products from API
   useEffect(() => {
+    // Purge legacy media cache if present to prevent stale dummy fallbacks
+    if (typeof window !== 'undefined' && 'caches' in window) {
+      caches.delete('sangath-media-cache-v1').catch(() => {});
+    }
+
     const loadStartTime = Date.now();
     const MIN_PRELOADER_TIME = 800; // Guarantee smooth luxury entrance
 

@@ -1,11 +1,12 @@
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
+import logo from '../assets/logo.png';
 import './AdminPreloader.css';
 
 function AdminPreloader({ 
   isExiting = false, 
   title = "Welcome to Sangath Team",
-  subtitle = "Initializing Enterprise Administration & Secure Command Center..." 
+  subtitle = "Initializing Enterprise Administration & Secure Command Center...",
+  logoImage 
 }) {
   return (
     <div className={`sangath-admin-preloader-overlay ${isExiting ? 'admin-preloader-exit' : ''}`} aria-label="Loading Admin Portal">
@@ -15,12 +16,16 @@ function AdminPreloader({
 
       {/* Center Frosted Glass Card */}
       <div className="admin-preloader-glass-card">
-        {/* Security Shield Icon with Glowing Radiance */}
+        {/* Company Brand Logo with Glowing Radiance */}
         <div className="admin-preloader-icon-wrap">
           <div className="admin-pulse-orbit orbit-1"></div>
           <div className="admin-pulse-orbit orbit-2"></div>
           <div className="admin-shield-badge">
-            <ShieldCheck size={36} className="admin-shield-svg" />
+            <img 
+              src={logoImage || logo} 
+              alt="Sangath Global Exim Logo" 
+              className="admin-preloader-logo-img" 
+            />
           </div>
         </div>
 

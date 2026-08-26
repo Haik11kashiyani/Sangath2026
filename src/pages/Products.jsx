@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { useCachedVideo } from '../utils/videoCache'
 import './Products.css'
 
 function Products({ setCurrentPage, onViewDetails, categories, websiteContent }) {
@@ -43,8 +42,6 @@ function Products({ setCurrentPage, onViewDetails, categories, websiteContent })
     bannerImage: "/images/Cumin_Seeds.jpg"
   };
 
-  const cachedHeaderVideo = useCachedVideo(header.bannerVideo);
-
   return (
     <div className="products-page">
       <div 
@@ -59,7 +56,7 @@ function Products({ setCurrentPage, onViewDetails, categories, websiteContent })
       >
         {header.bannerVideo && (
           <video
-            src={cachedHeaderVideo}
+            src={header.bannerVideo}
             autoPlay
             loop
             muted

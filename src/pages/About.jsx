@@ -1,7 +1,6 @@
 import { Check, Globe2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { getCountryFlagUrl } from '../utils/flags'
-import { useCachedVideo } from '../utils/videoCache'
 import './About.css'
 
 function About({ websiteContent }) {
@@ -44,7 +43,6 @@ function About({ websiteContent }) {
     bannerImage: bannerImage
   };
   const bannerUrl = header.bannerImage || bannerImage;
-  const cachedHeaderVideo = useCachedVideo(header.bannerVideo);
 
   return (
     <div className="about-page">
@@ -60,7 +58,7 @@ function About({ websiteContent }) {
       >
         {header.bannerVideo && (
           <video
-            src={cachedHeaderVideo}
+            src={header.bannerVideo}
             autoPlay
             loop
             muted
