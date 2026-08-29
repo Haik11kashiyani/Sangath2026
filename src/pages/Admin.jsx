@@ -1250,8 +1250,17 @@ function Admin({
                     <label>Office Address</label>
                     <input 
                       type="text" 
-                      value={cmsDraft.general.address}
+                      value={cmsDraft.general.address || ''}
                       onChange={(e) => handleDraftChange('general.address', sanitizeInput(e.target.value))}
+                    />
+                  </div>
+                  <div className="form-group-cms full-width">
+                    <label>Google Maps Custom Embed URL or iframe (Optional)</label>
+                    <input 
+                      type="text" 
+                      placeholder="Leave blank to automatically use Office Address, or paste custom embed URL/iframe"
+                      value={cmsDraft.general.mapEmbedUrl || ''}
+                      onChange={(e) => handleDraftChange('general.mapEmbedUrl', e.target.value.trim())}
                     />
                   </div>
                   <div className="form-group-cms full-width">
@@ -3633,19 +3642,22 @@ function InquiryCard({ inquiry, onStatusChange, onDelete }) {
     }
   }
 
+  const dateValue = inquiry.created_at || inquiry.timestamp || inquiry.date;
+  const formattedDate = dateValue ? new Date(dateValue).toLocaleString() : 'Recent';
+
   return (
-    <div className={`inquiry-card-wrapper ${inquiry.status} ${expanded ? 'expanded' : ''}`}>
+    <div className={`inquiry-card-wrapper ${inquiry.status || 'new'} ${expanded ? 'expanded' : ''}`}>
       <div className="inquiry-card-summary" onClick={() => setExpanded(!expanded)}>
         <span className={getStatusBadgeClass(inquiry.status)}>{(inquiry.status || 'new').toUpperCase()}</span>
         <div className="inquiry-meta-primary">
           <h4>{inquiry.name}</h4>
-          <span>{inquiry.email || ''} · {inquiry.phone || ''}</span>
+          <span>{inquiry.email || ''} {inquiry.phone ? `· ${inquiry.phone}` : ''}</span>
         </div>
         <div className="inquiry-meta-secondary">
           {inquiry.product && <span className="inquiry-product-tag">{inquiry.product}</span>}
-          <span className="inquiry-time">{new Date(inquiry.timestamp).toLocaleString()}</span>
+          <span className="inquiry-time">{formattedDate}</span>
         </div>
-        <button className="btn-expand-toggle">
+        <button className="btn-expand-toggle" aria-label="Toggle inquiry details">
           {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
         </button>
       </div>
@@ -3655,6 +3667,11 @@ function InquiryCard({ inquiry, onStatusChange, onDelete }) {
           <div className="inquiry-details-row">
             <strong>Subject:</strong> {inquiry.subject || 'Sample Request / Inquiry'}
           </div>
+          {inquiry.product && (
+            <div className="inquiry-details-row">
+              <strong>Product:</strong> {inquiry.product}
+            </div>
+          )}
           {inquiry.company && (
             <div className="inquiry-details-row">
               <strong>Company:</strong> {inquiry.company}

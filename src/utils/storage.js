@@ -8,6 +8,7 @@ export const DEFAULT_WEBSITE_CONTENT = {
     metaKeywords: "agricultural commodities, export, import, spices, oil seeds, fresh vegetables, cumin seeds, turmeric, black pepper, cardboard, mustard seeds, sunflower seeds, sesame seeds, groundnut, soybean, international trade, bulk trading, Sangath Global Exim",
     logoText: "Sangath Global Exim",
     address: "RK Empire, Rajkot, Gujarat, India",
+    mapEmbedUrl: "",
     phones: ["+91 93137 88416"],
     email: "export.sangath@gmail.com",
     socialLinks: {

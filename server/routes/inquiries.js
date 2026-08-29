@@ -43,27 +43,59 @@ router.get('/', authenticateToken, requirePermission('inquiries', 'all'), async 
 });
 
 router.post('/', (req, res, next) => {
-  // Apply sanitize middleware manually since we need it on fields
-  req.body.name = sanitize(req.body.name);
-  req.body.email = sanitize(req.body.email);
-  req.body.phone = sanitize(req.body.phone);
-  req.body.company = sanitize(req.body.company);
-  req.body.subject = sanitize(req.body.subject);
-  req.body.message = sanitize(req.body.message);
+  // Apply sanitize middleware manually on all potential fields
+  if (req.body) {
+    if (req.body.name !== undefined) req.body.name = sanitize(req.body.name);
+    if (req.body.email !== undefined) req.body.email = sanitize(req.body.email);
+    if (req.body.phone !== undefined) req.body.phone = sanitize(req.body.phone);
+    if (req.body.company !== undefined) req.body.company = sanitize(req.body.company);
+    if (req.body.country !== undefined) req.body.country = sanitize(req.body.country);
+    if (req.body.courier !== undefined) req.body.courier = sanitize(req.body.courier);
+    if (req.body.subject !== undefined) req.body.subject = sanitize(req.body.subject);
+    if (req.body.product !== undefined) req.body.product = sanitize(req.body.product);
+    if (req.body.quantity !== undefined) req.body.quantity = sanitize(req.body.quantity);
+    if (req.body.message !== undefined) req.body.message = sanitize(req.body.message);
+  }
   next();
 }, async (req, res) => {
   try {
-    const { name, email, phone, company, subject, message } = req.body;
+    const { name, email, phone, company, country, courier, subject, product, quantity, message } = req.body || {};
+    
+    const nameVal = (name || '').trim();
+    if (!nameVal) {
+      return res.status(400).json({ error: 'Full name is required' });
+    }
+
+    const emailVal = (email || '').trim();
+    const phoneVal = (phone || '').trim();
+    const companyVal = (company || '').trim();
+    const countryVal = (country || '').trim();
+    const courierVal = (courier || '').trim();
+    const productVal = (product || '').trim();
+    
+    let subjectVal = (subject || '').trim();
+    if (!subjectVal && productVal) {
+      subjectVal = `Inquiry for ${productVal}`;
+    } else if (!subjectVal) {
+      subjectVal = 'Website Contact Inquiry';
+    }
+
+    let messageVal = (message || '').trim();
+    if (quantity && String(quantity).trim()) {
+      const qText = `Quantity: ${String(quantity).trim()}`;
+      messageVal = messageVal ? `${qText}\n\n${messageVal}` : qText;
+    }
     
     const info = await db.execute({
-      sql: 'INSERT INTO inquiries (name, email, phone, company, subject, message) VALUES (?, ?, ?, ?, ?, ?)',
-      args: [name, email, phone, company, subject, message]
+      sql: 'INSERT INTO inquiries (name, email, phone, company, country, courier, subject, product, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [nameVal, emailVal, phoneVal, companyVal, countryVal, courierVal, subjectVal, productVal, messageVal]
     });
     
-    res.status(201).json({ id: info.lastInsertRowid.toString(), message: 'Inquiry submitted successfully' });
+    const insertedId = info?.lastInsertRowid ? info.lastInsertRowid.toString() : Date.now().toString();
+    res.status(201).json({ id: insertedId, message: 'Inquiry submitted successfully' });
   } catch (error) {
     console.error('Create inquiry error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
 });
 

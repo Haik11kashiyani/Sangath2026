@@ -8,6 +8,7 @@ import About from './pages/About'
 import Contact from './pages/Contact'
 
 import Home from './pages/Home'
+import Inquiry from './pages/Inquiry'
 import ProductDetail from './pages/ProductDetail'
 import Products from './pages/Products'
 import Quality from './pages/Quality'
@@ -284,6 +285,8 @@ function App() {
         return <Quality websiteContent={websiteContent} />
       case 'contact':
         return <Contact websiteContent={websiteContent} onRefreshInquiries={handleRefreshInquiries} />
+      case 'inquiry':
+        return <Inquiry websiteContent={websiteContent} onRefreshInquiries={handleRefreshInquiries} />
       case 'blog':
         return <Blog websiteContent={websiteContent} />
       case 'careers':

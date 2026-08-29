@@ -1,7 +1,13 @@
 import { useState } from 'react'
+import { CheckCircle2, AlertCircle } from 'lucide-react'
+import { sanitizeInput } from '../utils/security'
+import { submitInquiryApi } from '../utils/api'
 import './Inquiry.css'
 
-function Inquiry() {
+function Inquiry({ websiteContent, onRefreshInquiries }) {
+  const [loading, setLoading] = useState(false)
+  const [statusMsg, setStatusMsg] = useState(null) // { type: 'success' | 'error', message: string }
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,19 +22,59 @@ function Inquiry() {
       ...formData,
       [e.target.name]: e.target.value
     })
+    if (statusMsg) setStatusMsg(null)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    alert('Thank you for your inquiry! We will contact you soon.')
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      product: '',
-      quantity: '',
-      message: ''
-    })
+    setLoading(true)
+    setStatusMsg(null)
+
+    try {
+      const cleanName = sanitizeInput(formData.name)
+      const cleanEmail = sanitizeInput(formData.email)
+      const cleanPhone = sanitizeInput(formData.phone)
+      const cleanProduct = sanitizeInput(formData.product)
+      const cleanQuantity = sanitizeInput(formData.quantity)
+      const cleanMessage = sanitizeInput(formData.message)
+
+      if (!cleanName || !cleanName.trim()) {
+        throw new Error('Please enter your full name')
+      }
+
+      await submitInquiryApi({
+        name: cleanName,
+        email: cleanEmail,
+        phone: cleanPhone,
+        product: cleanProduct,
+        quantity: cleanQuantity,
+        subject: cleanProduct ? `Product Inquiry: ${cleanProduct}` : 'General Product Inquiry',
+        message: cleanMessage
+      })
+
+      if (onRefreshInquiries) onRefreshInquiries()
+
+      setStatusMsg({
+        type: 'success',
+        message: 'Thank you for your inquiry! Our export team will review your requirements and get back to you shortly.'
+      })
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        product: '',
+        quantity: '',
+        message: ''
+      })
+    } catch (err) {
+      console.error('Inquiry submission error:', err)
+      setStatusMsg({
+        type: 'error',
+        message: err.message || 'An error occurred while submitting your inquiry. Please try again.'
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -40,6 +86,17 @@ function Inquiry() {
         </p>
 
         <div className="inquiry-content">
+          {statusMsg && (
+            <div className={`contact-status-banner ${statusMsg.type}`} style={{ marginBottom: '1.5rem' }}>
+              {statusMsg.type === 'success' ? (
+                <CheckCircle2 size={20} className="status-icon" />
+              ) : (
+                <AlertCircle size={20} className="status-icon" />
+              )}
+              <span>{statusMsg.message}</span>
+            </div>
+          )}
+
           <form className="inquiry-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
@@ -125,8 +182,8 @@ function Inquiry() {
               />
             </div>
 
-            <button type="submit" className="submit-button">
-              Submit Inquiry
+            <button type="submit" className="submit-button" disabled={loading}>
+              {loading ? "Submitting Inquiry..." : "Submit Inquiry"}
             </button>
           </form>
         </div>

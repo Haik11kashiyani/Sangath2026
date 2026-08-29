@@ -1,4 +1,4 @@
-import { MailOpen, Building2, PhoneCall } from 'lucide-react'
+import { MailOpen, Building2, PhoneCall, MapPin, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { sanitizeInput } from '../utils/security'
 import { submitInquiryApi } from '../utils/api'
@@ -6,6 +6,7 @@ import './Contact.css'
 
 function Contact({ websiteContent, onRefreshInquiries }) {
   const [loading, setLoading] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState(null) // { type: 'success' | 'error', message: string }
 
   useEffect(() => {
     if (websiteContent?.general?.siteTitle) {
@@ -27,11 +28,13 @@ function Contact({ websiteContent, onRefreshInquiries }) {
       ...prev,
       [name]: value
     }))
+    if (submitStatus) setSubmitStatus(null)
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setSubmitStatus(null)
 
     try {
       const cleanName = sanitizeInput(formData.name);
@@ -39,6 +42,10 @@ function Contact({ websiteContent, onRefreshInquiries }) {
       const cleanPhone = sanitizeInput(formData.phone);
       const cleanSubject = sanitizeInput(formData.subject);
       const cleanMessage = sanitizeInput(formData.message);
+
+      if (!cleanName || !cleanName.trim()) {
+        throw new Error('Please enter your full name');
+      }
 
       await submitInquiryApi({
         name: cleanName,
@@ -50,10 +57,17 @@ function Contact({ websiteContent, onRefreshInquiries }) {
 
       if (onRefreshInquiries) onRefreshInquiries();
 
-      alert('Thank you for reaching out! Your inquiry has been sent to our team.');
+      setSubmitStatus({
+        type: 'success',
+        message: 'Thank you for reaching out! Your inquiry has been sent to our team.'
+      });
       setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     } catch (err) {
-      alert(err.message || 'An error occurred while sending your message.');
+      console.error('Inquiry submit error:', err);
+      setSubmitStatus({
+        type: 'error',
+        message: err.message || 'An error occurred while sending your message. Please try again.'
+      });
     } finally {
       setLoading(false);
     }
@@ -69,6 +83,18 @@ function Contact({ websiteContent, onRefreshInquiries }) {
     subtitle: `Get In Touch With ${general.logoText || "Sangath Global Exim"}`,
     bannerImage: "/images/Cumin_Seeds.jpg"
   };
+
+  // Build clean, working Google Maps embed URL
+  const customMapEmbed = websiteContent?.contact?.mapEmbedUrl || general.mapEmbedUrl || '';
+  let mapSrc = '';
+  if (customMapEmbed && typeof customMapEmbed === 'string') {
+    const match = customMapEmbed.match(/src=["']([^"']+)["']/i);
+    mapSrc = match ? match[1] : customMapEmbed.trim();
+  }
+  if (!mapSrc) {
+    mapSrc = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+  }
+  const googleMapsDirectionsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   return (
     <div className="contact-page">
@@ -151,24 +177,52 @@ function Contact({ websiteContent, onRefreshInquiries }) {
           <div className="map-form-grid">
             {/* Google Map */}
             <div className="map-container">
-              <h2>Find Us</h2>
+              <div className="map-title-row">
+                <h2>Find Us</h2>
+                <a 
+                  href={googleMapsDirectionsUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="btn-directions-link"
+                  title="Open location in Google Maps"
+                >
+                  <MapPin size={16} aria-hidden="true" />
+                  <span>Get Directions</span>
+                </a>
+              </div>
               <div className="map-placeholder">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3684.0!2d88.3631!3d22.5726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjLCsDM0JzIxLjQiTiA4OMKwMjEnNDcuNCJF!5e0!3m2!1sen!2sin!4v1234567890"
+                  src={mapSrc}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Sangath Global Exim Location"
+                  title={`${general.logoText || 'Sangath Global Exim'} Location Map`}
                 ></iframe>
+              </div>
+              <div className="map-address-banner">
+                <MapPin size={18} className="map-pin-icon" aria-hidden="true" />
+                <span className="map-address-text">{address}</span>
               </div>
             </div>
 
             {/* Contact Form */}
             <div className="form-container">
               <h2>Send Us a Message</h2>
+
+              {submitStatus && (
+                <div className={`contact-status-banner ${submitStatus.type}`}>
+                  {submitStatus.type === 'success' ? (
+                    <CheckCircle2 size={20} className="status-icon" />
+                  ) : (
+                    <AlertCircle size={20} className="status-icon" />
+                  )}
+                  <span>{submitStatus.message}</span>
+                </div>
+              )}
+
               <form className="contact-form" onSubmit={handleSubmit}>
                 <div className="form-group">
                   <label htmlFor="name">Full Name *</label>
@@ -234,7 +288,9 @@ function Contact({ websiteContent, onRefreshInquiries }) {
                   ></textarea>
                 </div>
 
-                <button type="submit" className="btn-submit" disabled={loading}>{loading ? "Sending..." : "Send Message"}</button>
+                <button type="submit" className="btn-submit" disabled={loading}>
+                  {loading ? "Sending..." : "Send Message"}
+                </button>
               </form>
             </div>
           </div>
